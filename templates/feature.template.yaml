@@ -1,0 +1,56 @@
+# Feature: {FEATURE_ID} - {FEATURE_NAME}
+#
+# This file tracks story status for Ralph autonomous execution.
+# The detailed implementation plan is in the referenced plan file.
+#
+# Status values: pending | in_progress | complete | blocked
+#
+# Usage:
+#   1. /plan-feature generates this file + the plan
+#   2. Ralph reads this to find next pending story
+#   3. Stories are updated as work progresses
+#   4. Notes capture per-story learnings (Tier 3 memory)
+
+id: F0000
+name: Feature Name
+branch: feature/feature-name
+plan: docs/agents/plans/F0000-feature-name.md
+created: YYYY-MM-DD
+
+# Validation commands (run after each story)
+validation:
+  lint: uv run ruff check src/ --fix
+  test: uv run pytest tests/ -x
+  # typecheck: uv run mypy src/
+
+stories:
+  - id: F0000-01
+    title: First story title
+    description: Brief description of what this story accomplishes
+    criteria:
+      - Specific, verifiable criterion
+      - Another criterion
+      - Lint passes
+    priority: 1
+    status: pending
+    attempts: 0
+    notes: ""
+
+  - id: F0000-02
+    title: Second story title
+    description: Brief description
+    criteria:
+      - Criterion 1
+      - Tests pass
+    priority: 2
+    status: pending
+    attempts: 0
+    notes: ""
+
+# Completion tracking
+# Updated by Ralph as stories complete
+summary:
+  total: 2
+  complete: 0
+  blocked: 0
+  pending: 2

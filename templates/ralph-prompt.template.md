@@ -1,6 +1,6 @@
 # Ralph Iteration Prompt
 
-Execute a SINGLE task from the current plan. One task per iteration, fresh context each time.
+Execute a SINGLE story from the current feature. One story per iteration, fresh context each time.
 
 ## Context Loading (IN THIS ORDER)
 
@@ -8,48 +8,70 @@ Execute a SINGLE task from the current plan. One task per iteration, fresh conte
    - These are learnings from previous iterations
    - Apply them to avoid repeating mistakes
 
-2. **Read `TODO.md`** - Find current plan file path
+2. **Read the feature YAML** - Find at `features/F####-*.yaml` or `features/current.yaml`
+   - Find the first story with `status: pending`
+   - Read its `criteria` for acceptance requirements
+   - Check `notes` field for any context from previous attempts
 
-3. **Read the plan file** - Find next pending task
-   - Look for first unchecked task `- [ ]`
-   - If all tasks done → output `FEATURE_COMPLETE`
+3. **Read the plan file** - Path is in the feature YAML's `plan` field
+   - Find the detailed task breakdown for the current story
+   - Follow the implementation guidance
 
 4. **Read `CLAUDE.md`** - Project conventions and patterns
 
 ## Execution Process
 
-### 1. Select Task
-- Find first incomplete task in plan
-- If ALL tasks complete → output `FEATURE_COMPLETE`
-- If ALL remaining tasks blocked → output `ALL_BLOCKED`
+### 1. Select Story
+- Find first story in feature YAML with `status: pending`
+- If ALL stories have `status: complete` → output `FEATURE_COMPLETE`
+- If ALL remaining stories have `status: blocked` → output `ALL_BLOCKED`
 
 ### 2. Implement
 - Follow patterns from CLAUDE.md
 - Apply learnings from progress.txt Codebase Patterns
-- Keep changes focused on JUST this task
+- Keep changes focused on JUST this story
+- Check the story's `criteria` - each must be satisfied
 
 ### 3. Verify
-- Run lint/test commands from plan's Validation section
+- Run validation commands from the feature YAML's `validation` section
+- Run any story-specific test commands in criteria
 - Fix any failures (up to 3 attempts)
 
 ### 4. On SUCCESS
-- Mark task complete in plan file `- [x]`
-- Commit: `git add -A && git commit -m "feat(scope): task description"`
+Update the feature YAML:
+```yaml
+- id: F0001-03
+  status: complete          # Change from pending
+  attempts: 1               # Number of attempts taken
+  notes: "Used X pattern, discovered Y"  # What you learned
+```
+
+Then:
+- Commit: `git add -A && git commit -m "feat(F0001-03): story title"`
 - Update progress.txt with learnings
 - Output `STORY_COMPLETE`
 
-### 5. On FAILURE (3 attempts)
+### 5. On FAILURE (after 3 attempts)
+Update the feature YAML:
+```yaml
+- id: F0001-03
+  status: blocked           # Change from pending
+  attempts: 3
+  notes: "Blocked because X. Tried Y and Z."
+```
+
+Then:
 - Do NOT commit broken code
 - Document blocker in progress.txt
 - Output `STORY_BLOCKED`
 
 ## Memory Updates (REQUIRED)
 
-After EVERY task, append to `features/progress.txt`:
+After EVERY story, append to `features/progress.txt`:
 
 ```markdown
 ### Iteration N - YYYY-MM-DD HH:MM
-**Task**: [task number] - [task title]
+**Story**: F0001-03 - Story title
 **Status**: complete | blocked
 **Learnings**:
 - [what was discovered that helps future iterations]
@@ -60,22 +82,49 @@ After EVERY task, append to `features/progress.txt`:
 
 If you discover a REUSABLE pattern, add it to the "Codebase Patterns" section at the TOP of progress.txt.
 
+## Feature YAML Updates
+
+Always update the story in the feature YAML file:
+- `status`: pending → complete | blocked
+- `attempts`: increment on each attempt
+- `notes`: add learnings specific to this story
+
+Example:
+```yaml
+stories:
+  - id: F0001-01
+    title: Add user model
+    status: complete
+    attempts: 1
+    notes: "Used existing Base class pattern from core/db.py"
+```
+
 ## Completion Markers
 
-Output EXACTLY ONE at the end:
+Output EXACTLY ONE at the end of your work:
 
 | Marker | When |
 |--------|------|
-| `STORY_COMPLETE` | Task done, ready for next iteration |
+| `STORY_COMPLETE` | Story done, ready for next iteration |
 | `STORY_BLOCKED` | Cannot complete after 3 attempts |
-| `FEATURE_COMPLETE` | ALL tasks in plan are done |
-| `ALL_BLOCKED` | All remaining tasks are blocked |
+| `FEATURE_COMPLETE` | ALL stories in feature YAML are complete |
+| `ALL_BLOCKED` | All remaining stories are blocked |
 
 ## Rules
 
-- ONE task per iteration (fresh context next time)
+- ONE story per iteration (fresh context next time)
 - ALWAYS read progress.txt Codebase Patterns FIRST
-- ALWAYS update progress.txt after task
+- ALWAYS update both feature YAML and progress.txt after story
 - NEVER commit broken code
-- NEVER skip tasks
-- STAY FOCUSED on the single task
+- NEVER skip stories (do them in priority order)
+- STAY FOCUSED on the single story
+- INCREMENT attempts count on each try
+- MARK blocked after 3 failed attempts
+
+## On Feature Completion
+
+When outputting `FEATURE_COMPLETE` or `ALL_BLOCKED`:
+1. Output the marker and a brief summary
+2. Do NOT attempt to plan or start the next feature
+3. Do NOT ask questions or request input
+4. Stop immediately - the outer loop will handle next steps

@@ -2,18 +2,29 @@
 # ralph.sh - Outer orchestrator for autonomous Claude Code execution
 #
 # Usage:
-#   ./ralph.sh [max_iterations] [prompt_file]
+#   ./ralph.sh [max_iterations] [feature_file]
 #
 # Examples:
-#   ./ralph.sh                    # Default: 15 iterations, ralph-prompt.md
-#   ./ralph.sh 25                 # 25 iterations
-#   ./ralph.sh 20 my-prompt.md    # Custom prompt file
+#   ./ralph.sh                              # Default: 15 iterations, auto-detect feature
+#   ./ralph.sh 25                           # 25 iterations
+#   ./ralph.sh 20 features/F0001-auth.yaml  # Specific feature file
+#
+# Prerequisites:
+#   - Git repository
+#   - claude CLI installed
+#   - Feature YAML file (features/F####-*.yaml or features/current.yaml)
+#   - ralph-prompt.md in project root
 
 set -e
 
+# Get script directory for finding helper scripts
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STATUS_SCRIPT="$SCRIPT_DIR/feature-status.py"
+
 # Configuration
 MAX_ITERATIONS=${1:-15}
-PROMPT_FILE=${2:-"ralph-prompt.md"}
+FEATURE_FILE=${2:-""}  # Empty = auto-detect
+PROMPT_FILE="ralph-prompt.md"
 PROGRESS_FILE="features/progress.txt"
 LOG_FILE="ralph.log"
 
@@ -21,6 +32,7 @@ LOG_FILE="ralph.log"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Initialize
@@ -36,30 +48,67 @@ log() {
 
 # Check prerequisites
 preflight_check() {
+    # Check for prompt file
     if [ ! -f "$PROMPT_FILE" ]; then
         echo -e "${RED}Error: Prompt file not found: $PROMPT_FILE${NC}"
-        echo "Create a ralph-prompt.md with your execution instructions."
+        echo "Copy from .prp/templates/ralph-prompt.template.md or create your own."
         exit 1
     fi
 
+    # Check git repo
     if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
         echo -e "${RED}Error: Not in a git repository${NC}"
         exit 1
     fi
 
+    # Check claude CLI
     if ! command -v claude &> /dev/null; then
         echo -e "${RED}Error: claude CLI not found${NC}"
         exit 1
     fi
 
-    # Create progress file if it doesn't exist
+    # Check for feature file
+    if [ -n "$FEATURE_FILE" ]; then
+        if [ ! -f "$FEATURE_FILE" ]; then
+            echo -e "${RED}Error: Feature file not found: $FEATURE_FILE${NC}"
+            exit 1
+        fi
+    else
+        # Auto-detect feature file
+        FEATURE_FILE=$(find features -maxdepth 1 -name "F[0-9][0-9][0-9][0-9]-*.yaml" 2>/dev/null | head -1)
+        if [ -z "$FEATURE_FILE" ]; then
+            FEATURE_FILE="features/current.yaml"
+        fi
+        if [ ! -f "$FEATURE_FILE" ]; then
+            echo -e "${RED}Error: No feature file found${NC}"
+            echo "Create one with /plan-feature or manually at features/F####-name.yaml"
+            exit 1
+        fi
+    fi
+
+    # Check status script
+    if [ ! -f "$STATUS_SCRIPT" ]; then
+        echo -e "${RED}Error: Status script not found: $STATUS_SCRIPT${NC}"
+        exit 1
+    fi
+
+    # Ensure progress file exists
     mkdir -p features
     if [ ! -f "$PROGRESS_FILE" ]; then
-        echo "# Progress Log" > "$PROGRESS_FILE"
-        echo "" >> "$PROGRESS_FILE"
-        echo "## Codebase Patterns" >> "$PROGRESS_FILE"
-        echo "" >> "$PROGRESS_FILE"
+        cat > "$PROGRESS_FILE" << 'EOF'
+# Progress Log
+
+## Codebase Patterns
+<!-- Learnings that benefit ALL iterations - READ FIRST -->
+
+---
+
+## Iteration Log
+
+EOF
     fi
+
+    echo -e "${BLUE}Feature file: $FEATURE_FILE${NC}"
 }
 
 # Create checkpoint for rollback
@@ -68,20 +117,35 @@ create_checkpoint() {
     git stash push -m "ralph-checkpoint-$(date +%Y%m%d-%H%M%S)" 2>/dev/null || true
 }
 
-# Check for completion markers
-check_completion() {
-    if grep -q "FEATURE_COMPLETE" "$PROGRESS_FILE" 2>/dev/null; then
-        return 0  # Complete
-    fi
-    return 1  # Not complete
+# Check story status using Python helper
+check_all_done() {
+    python3 "$STATUS_SCRIPT" all-done "$FEATURE_FILE" 2>/dev/null
+    return $?
 }
 
-# Check for blocked state
-check_blocked() {
-    if grep -q "ALL_BLOCKED" "$PROGRESS_FILE" 2>/dev/null; then
-        return 0  # Blocked
-    fi
-    return 1  # Not blocked
+check_all_blocked() {
+    python3 "$STATUS_SCRIPT" all-blocked "$FEATURE_FILE" 2>/dev/null
+    return $?
+}
+
+get_next_story() {
+    python3 "$STATUS_SCRIPT" next "$FEATURE_FILE" 2>/dev/null
+}
+
+get_pending_count() {
+    python3 "$STATUS_SCRIPT" pending "$FEATURE_FILE" 2>/dev/null
+}
+
+get_complete_count() {
+    python3 "$STATUS_SCRIPT" complete "$FEATURE_FILE" 2>/dev/null
+}
+
+# Print current status
+print_status() {
+    echo ""
+    echo -e "${BLUE}=== Feature Status ===${NC}"
+    python3 "$STATUS_SCRIPT" status "$FEATURE_FILE" 2>/dev/null || true
+    echo ""
 }
 
 # Cleanup on exit
@@ -97,6 +161,14 @@ cleanup() {
         echo "Duration: ${DURATION}s"
         echo "Log: $LOG_FILE"
         echo ""
+
+        # Show final status
+        COMPLETE=$(get_complete_count)
+        PENDING=$(get_pending_count)
+        echo "Stories complete: $COMPLETE"
+        echo "Stories pending: $PENDING"
+        echo ""
+
         echo "Recent commits:"
         git log --oneline -5
     fi
@@ -107,42 +179,67 @@ trap cleanup EXIT
 # Main loop
 main() {
     preflight_check
+    print_status
     create_checkpoint
 
     echo -e "${GREEN}Starting Ralph loop${NC}"
     echo "Max iterations: $MAX_ITERATIONS"
     echo "Prompt file: $PROMPT_FILE"
-    echo "Progress file: $PROGRESS_FILE"
+    echo "Feature file: $FEATURE_FILE"
     echo ""
 
     log "=== Ralph Loop Started ==="
+    log "Feature: $FEATURE_FILE"
 
     while [ $ITERATION -lt $MAX_ITERATIONS ]; do
         ITERATION=$((ITERATION + 1))
 
+        # Get next story to work on
+        NEXT_STORY=$(get_next_story)
+
         echo ""
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         log "Iteration $ITERATION of $MAX_ITERATIONS"
+        if [ -n "$NEXT_STORY" ]; then
+            echo -e "${BLUE}Next story: $NEXT_STORY${NC}"
+        fi
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-        # Run Claude with the prompt (skip permissions - hook blocks dangerous commands)
+        # Run Claude with the prompt
+        # Using --dangerously-skip-permissions since hooks handle safety
         if ! claude --dangerously-skip-permissions -p "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE"; then
             log "Claude exited with error"
         fi
 
-        # Check for completion
-        if check_completion; then
+        # Check for completion (all stories done)
+        if check_all_done; then
             echo ""
-            echo -e "${GREEN}✓ FEATURE_COMPLETE detected${NC}"
+            echo -e "${GREEN}✓ All stories complete!${NC}"
             log "Feature completed successfully"
+
+            # Append completion marker to progress file
+            echo "" >> "$PROGRESS_FILE"
+            echo "---" >> "$PROGRESS_FILE"
+            echo "## FEATURE_COMPLETE" >> "$PROGRESS_FILE"
+            echo "Completed at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$PROGRESS_FILE"
+            echo "Iterations: $ITERATION" >> "$PROGRESS_FILE"
+
             exit 0
         fi
 
-        # Check for blocked state
-        if check_blocked; then
+        # Check for blocked state (all remaining are blocked)
+        if check_all_blocked; then
             echo ""
-            echo -e "${RED}✗ ALL_BLOCKED detected${NC}"
+            echo -e "${RED}✗ All remaining stories blocked${NC}"
             log "All stories blocked - human intervention needed"
+
+            # Append blocked marker to progress file
+            echo "" >> "$PROGRESS_FILE"
+            echo "---" >> "$PROGRESS_FILE"
+            echo "## ALL_BLOCKED" >> "$PROGRESS_FILE"
+            echo "Blocked at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$PROGRESS_FILE"
+            echo "Iterations: $ITERATION" >> "$PROGRESS_FILE"
+
             exit 1
         fi
 
@@ -153,6 +250,11 @@ main() {
     echo ""
     echo -e "${YELLOW}⚠ Max iterations reached${NC}"
     log "Max iterations ($MAX_ITERATIONS) reached"
+
+    # Show what's left
+    PENDING=$(get_pending_count)
+    echo "Stories still pending: $PENDING"
+
     exit 2
 }
 

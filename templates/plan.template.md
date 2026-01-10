@@ -1,20 +1,25 @@
-# Feature: [NAME]
+# Feature: F0000 - [NAME]
 
-> Feature Spec: [link if applicable]
+> Feature Spec: `features/specs/F0000-name.md` (if applicable)
+> Story Tracking: `features/F0000-name.yaml`
 
 ## Problem Statement
+
 [What problem does this solve? Why is it needed?]
 
 ## Solution Overview
+
 [High-level approach in 2-3 sentences]
 
 ## Success Criteria
+
 - [ ] [Specific, testable criterion]
 - [ ] [Specific, testable criterion]
 - [ ] All tests pass
 - [ ] No lint errors
 
 ## Context & References
+
 - Pattern to follow: [link to similar feature or example]
 - Documentation: [relevant docs URLs]
 - Gotchas: [known issues to avoid]
@@ -35,19 +40,45 @@
 | `path/to/file` | Create | [purpose] |
 | `path/to/other` | Modify | [what changes] |
 
-## Implementation Tasks
+## Implementation Stories
 
-### Task 1: [Description]
-- [ ] Subtask 1.1
-- [ ] Subtask 1.2
+> Each story maps to an entry in the feature YAML.
+> Stories should be completable in 1-3 iterations.
 
-### Task 2: [Description]
-- [ ] Subtask 2.1
-- [ ] Subtask 2.2
+### F0000-01: [Story Title]
 
-### Task 3: [Description]
-- [ ] Subtask 3.1
-- [ ] Subtask 3.2
+**Criteria:**
+- [ ] Specific acceptance criterion
+- [ ] Another criterion
+- [ ] Validation passes
+
+**Tasks:**
+- [ ] Implementation step 1
+- [ ] Implementation step 2
+
+---
+
+### F0000-02: [Story Title]
+
+**Criteria:**
+- [ ] Specific acceptance criterion
+- [ ] Validation passes
+
+**Tasks:**
+- [ ] Implementation step 1
+- [ ] Implementation step 2
+
+---
+
+### F0000-03: [Story Title]
+
+**Criteria:**
+- [ ] Specific acceptance criterion
+- [ ] Validation passes
+
+**Tasks:**
+- [ ] Implementation step 1
+- [ ] Implementation step 2
 
 ## Testing Strategy
 
@@ -55,12 +86,18 @@
 - **Integration tests**: [what to test, where]
 - **Manual verification**: [how to verify manually]
 
-## Validation Checklist
+## Validation Commands
 
-- [ ] Run lint/format
-- [ ] Run tests
-- [ ] Manual smoke test
-- [ ] [Project-specific checks]
+```bash
+# Lint
+uv run ruff check src/ --fix
+
+# Tests
+uv run pytest tests/ -x
+
+# Type check (if applicable)
+# uv run mypy src/
+```
 
 ## Implementation Confidence
 
@@ -75,3 +112,7 @@ Confidence factors:
 Risks:
 - [Risk 1]
 - [Risk 2]
+
+Mitigations:
+- [Mitigation 1]
+- [Mitigation 2]
