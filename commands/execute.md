@@ -99,11 +99,16 @@ For each task in the plan:
     - Update `features/BACKLOG.md` with new status
     - Check off acceptance criteria that are met in the spec
 
-14. **Archive the plan**
+14. **Update TODO.md**
+    - Clear completed items from Current
+    - Add next feature to Current (if any in backlog)
+    - Add to Completed: `- [x] Implemented F{NNNN}: {title}`
+
+15. **Archive the plan**
     - Move the completed plan to completed plans directory
     - Rename with date: `{feature-name}-{YYYY-MM-DD}.md`
 
-15. **Summary report**
+16. **Summary report**
     Report the following:
     - Tasks completed (X/Y)
     - Feature(s) completed: [F{NNNN} list]
@@ -135,12 +140,9 @@ Before reporting completion, verify:
 - [ ] All plan tasks marked complete
 - [ ] All tests passing
 - [ ] No lint errors
-- [ ] Configuration correct
-- [ ] All success criteria from plan met
 - [ ] Feature spec(s) updated to Complete
-- [ ] Backlog updated
+- [ ] Backlog and TODO.md updated
 - [ ] Plan archived
-- [ ] Summary includes all files changed
 
 ## Output
 

@@ -98,9 +98,13 @@ $ARGUMENTS - Optional: specific PRD section, feature description, or document re
     - Which phase should each feature go in? (MVP, Enhancement, Future)
     - Confirm priority ordering within phase
 
-11. **Commit the features**
+11. **Update TODO.md**
+    - Update Current/Next sections with next actions
+    - Add to Completed: `- [x] Created F{start}-F{end}: {titles}`
+
+12. **Commit the features**
     ```bash
-    git add features/
+    git add features/ TODO.md
     git commit -m "feat(specs): add feature specs F{start}-F{end}"
     ```
 
@@ -108,7 +112,8 @@ $ARGUMENTS - Optional: specific PRD section, feature description, or document re
 
 1. Feature spec files created in `features/`
 2. Backlog updated with new features
-3. Summary:
+3. TODO.md updated with log entry
+4. Summary:
    - Features created: [list with IDs]
    - Total features: X
    - Ready for `/plan-feature F{NNNN}` or `/plan-feature F{NNNN},F{NNNN}` to create implementation plan

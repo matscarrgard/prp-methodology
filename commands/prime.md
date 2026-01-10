@@ -17,16 +17,16 @@ Load project context and prepare for a new task.
    - Run `git status` to see uncommitted changes
    - Run validation command if configured
 
-4. **Load feature state** (if exists)
-   - Read `features/progress.txt` for iteration history
-   - Read `features/current.json` for active feature status
+4. **Load session state**
+   - Read `TODO.md` for current/next tasks and recent log
+   - Read `features/BACKLOG.md` for feature status overview
+   - Read `features/progress.txt` for iteration history (if in-progress feature)
 
 5. **Summarize readiness**
    Provide a brief summary:
-   - Current features implemented
-   - Available reference documentation
+   - Current TODO items (from TODO.md)
+   - Feature backlog status (X draft, Y ready, Z in-progress, W complete)
    - Any outstanding issues (uncommitted changes, lint errors)
-   - Active feature status (if any)
    - Ready to receive task
 
 ## Output

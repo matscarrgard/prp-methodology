@@ -161,11 +161,14 @@ Load available pattern documentation for the project's tech stack.
 1. A structured plan saved to `docs/agents/plans/{NNNN}-{feature-name}.md`
 2. Feature spec(s) updated to "In Progress" status
 3. Backlog updated
-4. **Commit the plan**:
+4. TODO.md updated:
+   - Current: `/execute {plan-file}`
+   - Completed: `- [x] Planned F{NNNN}: {title}`
+5. **Commit the plan**:
    ```bash
    git add -A && git commit -m "plan({NNNN}): {feature-name}"
    ```
-5. A summary for human review including:
+6. A summary for human review including:
    - Feature overview
    - Number of tasks
    - Files to be created/modified
