@@ -170,8 +170,8 @@ Keep stories SMALL for Ralph:
 - Story notes updated in YAML
 - Reusable patterns promoted to progress.txt top
 
-### Monitoring
-Watch progress in real-time:
+### Monitoring (Terminal)
+Watch progress in real-time from separate terminals:
 ```bash
 # Terminal 1: Run Ralph
 .prp/scripts/ralph.sh 20
@@ -182,6 +182,31 @@ tail -f features/progress.txt
 # Terminal 3: Check status
 .prp/scripts/feature-status.py status
 ```
+
+### Monitoring (Claude Session)
+When monitoring Ralph from within a Claude Code session, use ONLY these two commands:
+
+```bash
+# 1. Check log (iteration number, recent output)
+tail -50 ralph.log
+
+# 2. Check story status (read the YAML file directly)
+# Use the Read tool on: features/F####-*.yaml
+```
+
+**Monitoring loop pattern:**
+1. Run `sleep 60` (wait)
+2. Run `tail -50 ralph.log` (check progress)
+3. If still running, repeat from step 1
+4. When complete, read the YAML file to confirm all stories done
+
+**DO NOT use:**
+- Complex bash loops (`while`, `for`)
+- Python scripts for status checking
+- TaskOutput for background task monitoring
+- grep/awk combinations
+
+Keep it simple: `sleep`, `tail`, `Read`.
 
 ### Human on the Loop
 You can be AFK, but:
