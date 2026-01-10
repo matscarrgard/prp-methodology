@@ -7,7 +7,7 @@ Create a structured implementation plan for a feature.
 ## Input
 
 $ARGUMENTS - Either:
-- A feature ID (e.g., `F0001`) to read from feature specs
+- A feature ID (e.g., `F0001`) or multiple IDs (e.g., `F0001,F0002`) to read from feature specs
 - A description of the feature to implement
 
 ## Context Loading
@@ -18,19 +18,26 @@ Load available pattern documentation for the project's tech stack.
 
 ### Phase 1: Understand the Request
 
-1. **Load feature spec** (if feature ID provided)
-   - Check feature specs directory for matching file
-   - Read the feature spec for requirements, acceptance criteria
-   - Use the spec as the primary source of truth
+1. **Load feature spec(s)** (if feature ID provided)
+   - Look for `features/F{ID}-*.md` matching each ID
+   - Support multiple IDs: `F0001,F0002` creates combined plan
+   - Read requirements, acceptance criteria from each spec
+   - Use specs as the primary source of truth
+   - **Update feature status to "In Progress"** in both the spec file and `features/BACKLOG.md`
 
 2. **Clarify the feature** (if description provided)
    - What exactly should this feature do?
    - What are the inputs and outputs?
    - What are the edge cases?
+   - Consider using `/create-features` first to create a proper spec
 
 3. **Check the PRD** (if exists)
    - Verify this feature aligns with project scope
    - Note any relevant constraints
+
+4. **Check dependencies**
+   - If feature depends on others (from spec), verify they are Complete
+   - Warn if dependencies are not met
 
 ### Phase 2: Codebase Intelligence
 
@@ -75,12 +82,12 @@ Load available pattern documentation for the project's tech stack.
 
 10. **Write the implementation plan**
 
-    Save to `docs/plans/{NNNN}-{feature-name}.md`:
+    Save to `docs/agents/plans/{NNNN}-{feature-name}.md`:
 
     ```markdown
     # Feature: [Name]
 
-    > Feature Spec: [link if applicable]
+    > Feature Spec: `features/F{NNNN}-{name}.md` (or multiple if combined)
 
     ## Problem Statement
     [What problem does this solve?]
@@ -151,12 +158,14 @@ Load available pattern documentation for the project's tech stack.
 
 ## Output
 
-1. A structured plan saved to `docs/plans/{NNNN}-{feature-name}.md`
-2. **Commit the plan**:
+1. A structured plan saved to `docs/agents/plans/{NNNN}-{feature-name}.md`
+2. Feature spec(s) updated to "In Progress" status
+3. Backlog updated
+4. **Commit the plan**:
    ```bash
    git add -A && git commit -m "plan({NNNN}): {feature-name}"
    ```
-3. A summary for human review including:
+5. A summary for human review including:
    - Feature overview
    - Number of tasks
    - Files to be created/modified

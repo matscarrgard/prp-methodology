@@ -93,13 +93,20 @@ For each task in the plan:
 
 ### Phase 5: Complete
 
-13. **Archive the plan**
+13. **Update feature spec status**
+    - If plan references feature spec(s) (F{NNNN})
+    - Update feature status to "Complete" in the spec file
+    - Update `features/BACKLOG.md` with new status
+    - Check off acceptance criteria that are met in the spec
+
+14. **Archive the plan**
     - Move the completed plan to completed plans directory
     - Rename with date: `{feature-name}-{YYYY-MM-DD}.md`
 
-14. **Summary report**
+15. **Summary report**
     Report the following:
     - Tasks completed (X/Y)
+    - Feature(s) completed: [F{NNNN} list]
     - Files created/modified (list them)
     - Validation results (all passing?)
     - Any deviations from the plan
@@ -130,6 +137,8 @@ Before reporting completion, verify:
 - [ ] No lint errors
 - [ ] Configuration correct
 - [ ] All success criteria from plan met
+- [ ] Feature spec(s) updated to Complete
+- [ ] Backlog updated
 - [ ] Plan archived
 - [ ] Summary includes all files changed
 
@@ -137,6 +146,7 @@ Before reporting completion, verify:
 
 A completion report with:
 - Final status (SUCCESS / BLOCKED)
+- Feature(s): F{NNNN} [list] marked Complete
 - Tasks: X/Y completed
 - Files changed: [list]
 - Validation: All passing / Issues remaining
