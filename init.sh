@@ -49,7 +49,7 @@ git subtree add --prefix=.prp prp-method main --squash
 
 # Step 4: Bootstrap
 echo "→ Running bootstrap..."
-.prp/scripts/bootstrap.sh
+.prp/scripts/bootstrap-new.sh
 
 # Step 5: Clean up init script
 echo "→ Cleaning up..."

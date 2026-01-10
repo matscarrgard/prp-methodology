@@ -1,7 +1,12 @@
 #!/bin/bash
-# Bootstrap PRP methodology - copy .claude/ and features/ directories
-# Run after adding the .prp subtree:
-#   .prp/scripts/bootstrap.sh
+# Bootstrap PRP methodology for NEW projects
+# Copies .claude/ and features/ directories from templates
+#
+# Usage (new project):
+#   .prp/scripts/bootstrap-new.sh
+#
+# For existing projects with .claude/ already present:
+#   .prp/scripts/bootstrap-existing.sh
 
 set -e
 

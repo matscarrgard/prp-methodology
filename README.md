@@ -2,26 +2,45 @@
 
 Language-agnostic AI coding methodology for Claude Code.
 
-## Quick Start
+## Quick Start (New Project)
 
 ```bash
-# 1. Create project and add methodology
+# Option A: One-command setup
 mkdir my-project && cd my-project
-git init
-git commit --allow-empty -m "Initial commit"
+curl -O https://raw.githubusercontent.com/matscarrgard/prp-methodology/main/init.sh
+chmod +x init.sh && ./init.sh
+
+# Option B: Manual setup
+mkdir my-project && cd my-project
+git init && git commit --allow-empty -m "Initial commit"
+git remote add prp-method https://github.com/matscarrgard/prp-methodology.git
+git subtree add --prefix=.prp prp-method main --squash
+.prp/scripts/bootstrap-new.sh
+```
+
+Then in Claude:
+```
+/prd              # Create PRD from inputs or conversation
+/init-project     # Add language boilerplate (optional)
+/scaffold         # Create project structure (if boilerplate added)
+```
+
+## Adding to Existing Project
+
+```bash
+# 1. Add methodology subtree
+cd existing-project
 git remote add prp-method https://github.com/matscarrgard/prp-methodology.git
 git subtree add --prefix=.prp prp-method main --squash
 
-# 2. Bootstrap (copies .claude/ and features/)
-.prp/scripts/bootstrap.sh
+# 2. Bootstrap (preserves existing .claude/)
+.prp/scripts/bootstrap-existing.sh
+```
 
-# 3. Start Claude Code
-claude
-
-# 4. Create PRD and scaffold (optional: add language boilerplate)
-/prd              # Create PRD from inputs or conversation
-/init-project     # Wire methodology + optionally add boilerplate
-/scaffold         # Create project structure (if boilerplate added)
+Then in Claude:
+```
+/prd              # Create PRD documenting existing project
+/prime            # Verify setup
 ```
 
 ## Workflow
@@ -72,7 +91,9 @@ claude
 ├── hooks/              # Safety hooks (bash validation)
 ├── instructions/       # Methodology docs
 ├── templates/          # Starter files
-├── scripts/            # Bootstrap, sync helpers
+├── scripts/
+│   ├── bootstrap-new.sh      # For new projects
+│   └── bootstrap-existing.sh # For existing projects
 ├── .claude-template/   # Pre-configured .claude/ for bootstrap
 └── features-template/  # Pre-configured features/ for bootstrap
 ```
