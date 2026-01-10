@@ -29,12 +29,19 @@ Iteration 2: [Plan][Story2][Commit] → fresh
 Iteration 3: [Plan][Story3][Commit] → fresh
 ```
 
-### Memory via Files
+### Memory via Files (Three-Tier System)
 
-State persists through files, not context:
-- `features/progress.txt` - Learnings and history
-- Plan file - Task status
-- Git commits - Working increments
+State persists through files, not context. Based on Carson's pattern:
+
+| Tier | File | Scope | Contains |
+|------|------|-------|----------|
+| **1** | `CLAUDE.md` | Project-wide | Conventions, patterns, tech stack |
+| **2** | `features/progress.txt` | Feature-wide | Codebase patterns, iteration history |
+| **3** | Plan file | Task-wide | Story status, acceptance criteria |
+
+Reading order matters: Tier 2 Codebase Patterns → Plan file → CLAUDE.md
+
+Git commits provide atomic rollback points for each completed story.
 
 ## Implementation Options
 
@@ -129,10 +136,16 @@ Always set a limit:
 ```
 
 ### Cost Monitoring
-Watch API costs. Rough estimates:
-- Simple story: ~$0.50-2
-- Complex story: ~$2-5
-- Full feature (5-10 stories): ~$10-30
+Watch API costs. Rough estimates per iteration:
+
+| Task Type | Input Tokens | Output Tokens | Estimated Cost |
+|-----------|--------------|---------------|----------------|
+| Simple story | ~10K | ~2K | $0.50-1.50 |
+| Medium story | ~20K | ~5K | $1.50-3.00 |
+| Complex story | ~40K | ~10K | $3.00-6.00 |
+| Debug/retry | ~30K | ~8K | $2.00-5.00 |
+
+Full feature estimates (5-10 stories): $15-40
 
 ### Checkpoint Commits
 Each successful story creates a commit. Rollback is easy:

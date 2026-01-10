@@ -9,6 +9,7 @@ Add learnings that benefit ALL future iterations here.
 ---
 
 ## Current Feature: [FEATURE_NAME]
+Plan: `docs/agents/plans/[plan-file].md`
 Branch: feature/[branch-name]
 Started: [YYYY-MM-DD]
 
