@@ -1,8 +1,22 @@
 # Initialize Project with PRP Methodology
 
-Wire the PRP methodology and optionally add language-specific boilerplate.
+Wire the PRP methodology and add language-specific boilerplate or patterns.
+
+Handles both **new projects** (full setup) and **existing projects** (selective pattern adoption).
 
 ## Process
+
+### Phase 0: Detect Project Type
+
+Check for existing project indicators:
+
+```bash
+# Existing project if ANY of these exist:
+[ -f "CLAUDE.md" ] || [ -d "src" ] || [ -f "pyproject.toml" ] || [ -f "package.json" ]
+```
+
+**New project**: No existing code structure
+**Existing project**: Has CLAUDE.md, src/, or project config files
 
 ### Phase 1: Verify Methodology Present
 
@@ -18,11 +32,16 @@ Methodology not found. Add it first:
 
   git remote add prp-method https://github.com/matscarrgard/prp-methodology.git
   git subtree add --prefix=.prp prp-method main --squash
+  .prp/scripts/bootstrap-existing.sh  # For existing projects
+  # OR
+  .prp/scripts/bootstrap-new.sh       # For new projects
 
 Then run /init-project again.
 ```
 
 ### Phase 2: Wire Claude Code
+
+**For new projects** (no .claude/ directory):
 
 1. **Create .claude directory structure**
    ```bash
@@ -31,7 +50,6 @@ Then run /init-project again.
 
 2. **Create command symlinks** (link to methodology)
    ```bash
-   # Symlink all methodology commands
    for cmd in .prp/commands/*.md; do
      name=$(basename "$cmd")
      ln -sf "../../.prp/commands/$name" ".claude/commands/$name"
@@ -49,47 +67,39 @@ Then run /init-project again.
    ln -sf ../../.prp/skills/error-handling .claude/skills/error-handling
    ```
 
-5. **Configure hooks** in `.claude/settings.json`:
-   ```json
-   {
-     "hooks": {
-       "PreToolUse": [
-         {
-           "matcher": "Bash",
-           "hooks": [
-             {
-               "type": "command",
-               "command": "python \"$CLAUDE_PROJECT_DIR/.prp/hooks/validate-bash.py\""
-             }
-           ]
-         }
-       ]
-     }
-   }
-   ```
+5. **Configure hooks** in `.claude/settings.json`
+
+**For existing projects** (already has .claude/):
+
+Skip this phase - assume bootstrap-existing.sh was run.
+Verify commands are linked:
+```bash
+ls -la .claude/commands/*.md | head -3
+```
 
 ### Phase 3: Setup Features Directory
 
 ```bash
 mkdir -p features/archive
-cp .prp/templates/progress.template.txt features/progress.txt
+[ -f features/progress.txt ] || cp .prp/templates/progress.template.txt features/progress.txt
 ```
 
-### Phase 4: Add Language Boilerplate (Optional)
+---
+
+## Phase 4: Add Boilerplate
+
+### For NEW Projects
 
 **Ask the user using AskUserQuestion:**
 
 "Do you want to add a language-specific boilerplate?"
 
-Options:
 | Option | Repository | Description |
 |--------|------------|-------------|
 | **Python** | `matscarrgard/python-boilerplate` | FastAPI, FastHTML, SQLAlchemy patterns |
 | **None** | - | Start with minimal CLAUDE.md template |
 
-*(Future: React, Go, Rust boilerplates)*
-
-#### If Python selected:
+#### If Python selected (new project):
 
 1. **Add boilerplate as subtree**
    ```bash
@@ -97,74 +107,138 @@ Options:
    git subtree add --prefix=.boilerplate py-boilerplate main --squash
    ```
 
-2. **Copy boilerplate files to root** (decoupled from template)
+2. **Copy all boilerplate files to root**
    ```bash
-   # Copy project files
    cp .boilerplate/CLAUDE.md .
    cp .boilerplate/pyproject.toml .
    cp .boilerplate/.gitignore . 2>/dev/null || true
    cp .boilerplate/.env.example . 2>/dev/null || true
    cp -r .boilerplate/src .
    cp -r .boilerplate/tests .
-
-   # Copy docs/guides
    mkdir -p docs/agents/guides
    cp -r .boilerplate/docs/agents/guides/* docs/agents/guides/
-
-   # Copy the scaffold command (not symlinked - project-specific)
    cp .boilerplate/.claude/commands/scaffold.md .claude/commands/
    ```
 
-3. **Keep .boilerplate/** - DO NOT remove it. It stays as a subtree for:
-   - Pulling template updates: `git subtree pull --prefix=.boilerplate py-boilerplate main --squash`
-   - Pushing improvements back: `git subtree push --prefix=.boilerplate py-boilerplate main`
-
-4. **Add .boilerplate to .gitignore considerations**
-   - The directory IS tracked (it's a subtree)
-   - Files copied to root are independent of the template
-   - Updates to guides should be made in `.boilerplate/` then copied out
-
-5. **Install dependencies**
+3. **Install dependencies**
    ```bash
    uv sync
    ```
 
-6. **Inform user**:
+4. **Inform user**:
    ```
    Python boilerplate added!
-
-   Files copied to project root (independent of template).
-   Template kept at .boilerplate/ for future updates.
 
    Next steps:
    1. Edit CLAUDE.md with your project name/description
    2. Run /scaffold to create project structure (api-only, web-only, etc.)
    3. Run /prime to verify setup
-
-   To update template later:
-   - Pull: git subtree pull --prefix=.boilerplate py-boilerplate main --squash
-   - Push: git subtree push --prefix=.boilerplate py-boilerplate main
    ```
 
-#### If None selected:
+#### If None selected (new project):
 
 1. **Create minimal CLAUDE.md from template**
    ```bash
    cp .prp/templates/CLAUDE.template.md CLAUDE.md
    ```
 
-2. **Inform user**:
-   ```
-   Minimal setup complete!
+2. **Inform user** to fill in CLAUDE.md
 
-   CLAUDE.md created from template. Please update it with:
-   - Project name and overview
-   - Your tech stack
-   - Project commands (Install, Test, Lint, Run)
-   - Pattern guide locations (if any)
+---
 
-   Run /prime to verify setup.
+### For EXISTING Projects
+
+**Ask the user using AskUserQuestion:**
+
+"Do you want to add the Python boilerplate as a reference for patterns and guides?"
+
+| Option | Description |
+|--------|-------------|
+| **Yes, add reference** | Add .boilerplate/ subtree, then choose what to adopt |
+| **No, skip** | Continue without boilerplate reference |
+
+#### If Yes selected (existing project):
+
+1. **Add boilerplate as subtree** (reference only)
+   ```bash
+   git remote add py-boilerplate https://github.com/matscarrgard/python-boilerplate.git
+   git subtree add --prefix=.boilerplate py-boilerplate main --squash
    ```
+
+2. **Show available assets using AskUserQuestion** (multiSelect: true):
+
+   "What would you like to adopt from the boilerplate?"
+
+   | Option | Path | Description |
+   |--------|------|-------------|
+   | **Pattern guides** | `docs/agents/guides/` | FastAPI, SQLAlchemy, testing, error handling patterns |
+   | **Testing structure** | `tests/` | Unit/integration test layout with conftest.py |
+   | **Scaffold command** | `.claude/commands/scaffold.md` | Project scaffolding for adding new features |
+   | **Example configs** | `.env.example`, `.gitignore` | Environment and git configuration |
+   | **None** | - | Just keep .boilerplate/ as reference |
+
+3. **Copy selected assets** (merge, don't overwrite):
+
+   **Pattern guides** (if selected):
+   ```bash
+   mkdir -p docs/agents/guides
+   # Copy guides that don't exist locally
+   for guide in .boilerplate/docs/agents/guides/*.md; do
+     name=$(basename "$guide")
+     [ -f "docs/agents/guides/$name" ] || cp "$guide" "docs/agents/guides/"
+   done
+   echo "Copied guides. Review and customize for your project."
+   ```
+
+   **Testing structure** (if selected):
+   ```bash
+   mkdir -p tests/unit tests/integration
+   [ -f tests/conftest.py ] || cp .boilerplate/tests/conftest.py tests/
+   [ -f tests/__init__.py ] || cp .boilerplate/tests/__init__.py tests/
+   echo "Created test structure. Existing tests preserved."
+   ```
+
+   **Scaffold command** (if selected):
+   ```bash
+   cp .boilerplate/.claude/commands/scaffold.md .claude/commands/
+   echo "Added /scaffold command. Run it to add new components."
+   ```
+
+   **Example configs** (if selected):
+   ```bash
+   [ -f .env.example ] || cp .boilerplate/.env.example .
+   # For .gitignore, append rather than overwrite
+   if [ -f .gitignore ]; then
+     echo "# Check .boilerplate/.gitignore for additional patterns" >> .gitignore
+   else
+     cp .boilerplate/.gitignore .
+   fi
+   ```
+
+4. **Inform user**:
+   ```
+   Boilerplate reference added at .boilerplate/
+
+   Selected assets copied to your project.
+   The .boilerplate/ directory is kept as a reference - browse it for:
+   - Additional patterns and examples
+   - Template code to adapt
+
+   To update boilerplate later:
+   - Pull: git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+
+   Next: Run /prd to create a PRD for your existing project.
+   ```
+
+#### If No selected (existing project):
+
+```
+Skipping boilerplate. You can add it later by running /init-project again.
+
+Next: Run /prd to create a PRD for your existing project.
+```
+
+---
 
 ### Phase 5: Verify Setup
 
@@ -174,30 +248,42 @@ echo "=== Verifying setup ==="
 ls -la .claude/commands/ | head -5
 ls -la .claude/skills/
 ls features/
-head -10 CLAUDE.md 2>/dev/null || echo "CLAUDE.md not found"
+[ -d .boilerplate ] && echo ".boilerplate/ present (reference)"
+head -5 CLAUDE.md 2>/dev/null || echo "CLAUDE.md: update needed"
 ```
 
-## Output
+## Output Summary
 
+### For New Projects
 ```markdown
-## PRP Methodology Initialized
+## PRP Methodology Initialized (New Project)
 
-### Methodology Wired
-- [x] .claude/commands → .prp/commands (symlinks)
-- [x] .claude/agents → .prp/agents (symlink)
-- [x] .claude/skills/ (prp-methodology, error-handling)
-- [x] .claude/settings.json (hooks configured)
+- [x] .claude/ configured with methodology commands
 - [x] features/progress.txt created
+- [x] Boilerplate: {Python | None}
 
-### Boilerplate
-- [x] Python boilerplate added (or "Minimal setup - no boilerplate")
-
-### Next Steps
+Next steps:
 1. Edit CLAUDE.md with your project details
-2. Run /scaffold to create project structure (if Python boilerplate)
-3. Run /prime to verify everything works
-4. Run /plan-feature to start building!
+2. Run /scaffold to create project structure
+3. Run /plan-feature to start building!
 ```
+
+### For Existing Projects
+```markdown
+## PRP Methodology Initialized (Existing Project)
+
+- [x] Methodology commands available
+- [x] features/progress.txt created
+- [x] Boilerplate reference: {Added | Skipped}
+- [x] Adopted: {list of selected assets}
+
+Next steps:
+1. Update CLAUDE.md with workflow section (if needed)
+2. Run /prd to document your existing project
+3. Run /prime to verify setup
+```
+
+---
 
 ## Available Boilerplates
 
@@ -209,46 +295,23 @@ head -10 CLAUDE.md 2>/dev/null || echo "CLAUDE.md not found"
 
 ## Re-running Init
 
-If already initialized, `/init-project` will:
-- Check current state
-- Offer to refresh symlinks
-- Offer to re-pull boilerplate (with confirmation)
+Running `/init-project` again will:
+- Detect current state (new vs existing, boilerplate present)
+- Offer to add missing components
+- For existing boilerplate: offer to adopt additional assets
 
 ## Updating Templates
 
-Both `.prp/` (methodology) and `.boilerplate/` (language-specific) are git subtrees.
-
-### Pull Latest Updates
-
-**Always pull before making changes** to avoid conflicts:
+Both `.prp/` and `.boilerplate/` are git subtrees.
 
 ```bash
-# Update methodology
+# Pull latest
 git subtree pull --prefix=.prp prp-method main --squash
-
-# Update boilerplate (if using Python)
 git subtree pull --prefix=.boilerplate py-boilerplate main --squash
-```
 
-### Push Improvements Back
-
-If you improve guides, patterns, or templates:
-
-```bash
-# Push methodology improvements
+# Push improvements
 git subtree push --prefix=.prp prp-method main
-
-# Push boilerplate improvements
 git subtree push --prefix=.boilerplate py-boilerplate main
 ```
 
-### Workflow for Template Updates
-
-1. **Pull latest** from upstream
-2. **Make changes** in `.prp/` or `.boilerplate/`
-3. **Test changes** in your project
-4. **Commit** your changes locally
-5. **Push back** to upstream repo
-
-Note: Changes in `.boilerplate/` don't automatically update files at root.
-If you improve a guide, manually copy it: `cp .boilerplate/docs/agents/guides/x.md docs/agents/guides/`
+**Always pull before making changes** to avoid conflicts.
