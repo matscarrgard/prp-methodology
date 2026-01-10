@@ -1,0 +1,35 @@
+{
+  "name": "feature-name",
+  "branch": "feature/feature-name",
+  "description": "Brief description of the feature",
+  "created": "YYYY-MM-DD",
+  "stories": [
+    {
+      "id": "FEAT-001",
+      "title": "First story title",
+      "description": "Detailed description of what needs to be done",
+      "criteria": [
+        "Specific acceptance criterion 1",
+        "Specific acceptance criterion 2",
+        "Tests pass: [specific test command]"
+      ],
+      "priority": 1,
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "FEAT-002",
+      "title": "Second story title",
+      "description": "Detailed description",
+      "criteria": [
+        "Acceptance criterion",
+        "Tests pass"
+      ],
+      "priority": 2,
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    }
+  ]
+}

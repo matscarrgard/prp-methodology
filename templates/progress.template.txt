@@ -1,0 +1,30 @@
+# Progress Log
+
+## Codebase Patterns
+<!--
+READ THIS SECTION FIRST every iteration.
+Add learnings that benefit ALL future iterations here.
+-->
+
+---
+
+## Current Feature: [FEATURE_NAME]
+Branch: feature/[branch-name]
+Started: [YYYY-MM-DD]
+
+---
+
+## Iteration Log
+
+<!--
+After each story, append:
+
+### Iteration N - [timestamp]
+**Story**: [ID] - [title]
+**Status**: complete|blocked
+**Learnings**:
+- [what was discovered]
+**Files Changed**:
+- [list]
+**Commit**: [hash] (if complete)
+-->
