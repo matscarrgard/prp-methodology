@@ -125,8 +125,8 @@ main() {
         log "Iteration $ITERATION of $MAX_ITERATIONS"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-        # Run Claude with the prompt (acceptEdits skips permission prompts for file changes)
-        if ! claude --permission-mode acceptEdits -p "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE"; then
+        # Run Claude with the prompt (skip permissions - hook blocks dangerous commands)
+        if ! claude --dangerously-skip-permissions -p "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE"; then
             log "Claude exited with error"
         fi
 

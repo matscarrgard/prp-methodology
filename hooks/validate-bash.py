@@ -14,6 +14,34 @@ import json
 import re
 import sys
 
+# Commands that are auto-allowed - safe for autonomous execution
+ALLOW_PATTERNS = [
+    # Linting and formatting
+    r"^(uv\s+run\s+)?ruff\s+(check|format)",
+    r"^(uv\s+run\s+)?black\s+",
+    r"^(uv\s+run\s+)?isort\s+",
+    r"^(uv\s+run\s+)?mypy\s+",
+    r"^(uv\s+run\s+)?pylint\s+",
+    # Testing
+    r"^(uv\s+run\s+)?pytest\s+",
+    r"^(uv\s+run\s+)?python\s+-m\s+pytest",
+    # Package management
+    r"^uv\s+(sync|lock|pip|run|add)",
+    r"^pip\s+(install|list|show)",
+    # Git (safe operations)
+    r"^git\s+(status|log|diff|show|branch|stash|add|commit|fetch)",
+    r"^git\s+ls-files",
+    # File inspection (read-only)
+    r"^(ls|cat|head|tail|wc|file|stat)\s+",
+    r"^find\s+.*-type\s+[fd]",
+    r"^grep\s+",
+    r"^tree\s+",
+    # Build tools
+    r"^(npm|yarn|pnpm)\s+(install|run|test|build)",
+    r"^make\s+",
+    r"^cargo\s+(build|test|check|clippy)",
+]
+
 # Commands that are ALWAYS blocked - catastrophic risk
 BLOCKED_PATTERNS = [
     (r"rm\s+-rf\s+/(?!\w)", "Cannot delete root filesystem"),
@@ -63,7 +91,21 @@ def main():
     if not cmd:
         sys.exit(0)
 
-    # Check blocked patterns first
+    # Check allow patterns first - auto-approve safe commands
+    for pattern in ALLOW_PATTERNS:
+        if re.search(pattern, cmd.strip(), re.IGNORECASE):
+            # Output JSON to auto-allow
+            result = {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow",
+                    "permissionDecisionReason": "Safe command pattern"
+                }
+            }
+            print(json.dumps(result))
+            sys.exit(0)
+
+    # Check blocked patterns
     for pattern, msg in BLOCKED_PATTERNS:
         if re.search(pattern, cmd, re.IGNORECASE):
             print(f"BLOCKED: {msg}", file=sys.stderr)
