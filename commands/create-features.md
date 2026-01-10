@@ -21,7 +21,7 @@ $ARGUMENTS - Optional: specific PRD section, feature description, or document re
    - Note any prioritization or phasing
 
 3. **Scan existing features**
-   - List `features/F*.md` to find highest feature number
+   - List `features/F*/` directories to find highest feature number
    - Next feature will be F{max + 1}
    - Note any dependencies between existing features
 
@@ -62,9 +62,10 @@ $ARGUMENTS - Optional: specific PRD section, feature description, or document re
 
 7. **For each confirmed feature**:
 
+   - Create folder `features/F{NNNN}-{kebab-case-title}/`
    - Load template from `.prp/templates/feature-spec.template.md`
    - Fill in all sections
-   - Save to `features/F{NNNN}-{kebab-case-title}.md`
+   - Save to `features/F{NNNN}-{kebab-case-title}/F{NNNN}-spec.md`
    - Mark status as "Draft"
 
 8. **Estimate size**:

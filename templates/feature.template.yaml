@@ -14,7 +14,8 @@
 id: F0000
 name: Feature Name
 branch: feature/feature-name
-plan: docs/agents/plans/F0000-feature-name.md
+plan: features/F0000-feature-name/F0000-plan.md
+spec: features/F0000-feature-name/F0000-spec.md
 created: YYYY-MM-DD
 
 # Validation commands (run after each story)

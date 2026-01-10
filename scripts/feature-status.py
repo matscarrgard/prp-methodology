@@ -19,7 +19,7 @@ Commands:
     get <id>    Print story details as KEY=VALUE pairs
 
 Examples:
-    ./feature-status.py next features/F0001-epub-parsing.yaml
+    ./feature-status.py next features/F0001-epub-parsing/F0001-tracking.yaml
     ./feature-status.py status
     ./feature-status.py all-done && echo "Feature complete!"
 """

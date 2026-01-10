@@ -145,5 +145,8 @@ git subtree push --prefix=.boilerplate py-boilerplate main
 
 - **PRD**: `docs/agents/prd.md` - Project scope and feature list
 - **Progress**: `features/progress.txt` - Iteration memory
-- **Plans**: `docs/agents/plans/` - Implementation plans
+- **Features**: `features/F####-name/` - Per-feature folders containing:
+  - `F####-spec.md` - Feature specification
+  - `F####-plan.md` - Implementation plan
+  - `F####-tracking.yaml` - Story tracking for Ralph
 - **CLAUDE.md**: Project-specific config and commands

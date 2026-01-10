@@ -19,7 +19,7 @@ Load available pattern documentation for the project's tech stack.
 ### Phase 1: Understand the Request
 
 1. **Load feature spec(s)** (if feature ID provided)
-   - Look for `features/F{ID}-*.md` matching each ID
+   - Look for `features/F{ID}-*/F{ID}-spec.md` matching each ID
    - Support multiple IDs: `F0001,F0002` creates combined plan
    - Read requirements, acceptance criteria from each spec
    - Use specs as the primary source of truth
@@ -82,12 +82,12 @@ Load available pattern documentation for the project's tech stack.
 
 10. **Write the implementation plan**
 
-    Save to `docs/agents/plans/{NNNN}-{feature-name}.md`:
+    Save to `features/F{NNNN}-{feature-name}/F{NNNN}-plan.md`:
 
     ```markdown
     # Feature: [Name]
 
-    > Feature Spec: `features/F{NNNN}-{name}.md` (or multiple if combined)
+    > Feature Spec: `features/F{NNNN}-{name}/F{NNNN}-spec.md`
 
     ## Problem Statement
     [What problem does this solve?]
@@ -158,11 +158,13 @@ Load available pattern documentation for the project's tech stack.
 
 ## Output
 
-1. A structured plan saved to `docs/agents/plans/{NNNN}-{feature-name}.md`
-2. Feature spec(s) updated to "In Progress" status
+1. Feature folder created at `features/F{NNNN}-{feature-name}/` with:
+   - `F{NNNN}-plan.md` - Implementation plan
+   - `F{NNNN}-tracking.yaml` - Story tracking for Ralph
+2. Feature spec updated to "In Progress" status
 3. Backlog updated
 4. TODO.md updated:
-   - Current: `/execute {plan-file}`
+   - Current: Run Ralph on the feature
    - Completed: `- [x] Planned F{NNNN}: {title}`
 5. **Commit the plan**:
    ```bash

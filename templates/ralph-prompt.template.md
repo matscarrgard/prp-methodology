@@ -8,7 +8,7 @@ Execute a SINGLE story from the current feature. One story per iteration, fresh 
    - These are learnings from previous iterations
    - Apply them to avoid repeating mistakes
 
-2. **Read the feature YAML** - Find at `features/F####-*.yaml` or `features/current.yaml`
+2. **Read the feature tracking YAML** - Find at `features/F####-*/F####-tracking.yaml`
    - Find the first story with `status: pending`
    - Read its `criteria` for acceptance requirements
    - Check `notes` field for any context from previous attempts

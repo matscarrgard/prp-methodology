@@ -37,7 +37,7 @@ State persists through files, not context:
 |------|------|-------|----------|
 | **1** | `CLAUDE.md` | Project-wide | Conventions, patterns, tech stack |
 | **2** | `features/progress.txt` | Feature-wide | Codebase patterns, iteration history |
-| **3** | `features/F####-name.yaml` | Story-level | Status, criteria, per-story notes |
+| **3** | `features/F####-name/F####-tracking.yaml` | Story-level | Status, criteria, per-story notes |
 
 Reading order matters: Tier 2 Codebase Patterns → Feature YAML → Plan file → CLAUDE.md
 
@@ -45,13 +45,13 @@ Reading order matters: Tier 2 Codebase Patterns → Feature YAML → Plan file �
 
 ```
 features/
-├── F0001-epub-parsing.yaml    # Story tracking (status, notes)
-├── progress.txt               # Iteration memory
-└── specs/                     # Optional feature specs
-    └── F0001-epub-parsing.md
-
-docs/agents/plans/
-└── F0001-epub-parsing.md      # Detailed implementation plan
+├── BACKLOG.md                 # Feature status overview
+├── progress.txt               # Iteration memory (codebase patterns)
+├── F0001-epub-parsing/        # Per-feature folder
+│   ├── F0001-spec.md          # Feature specification
+│   ├── F0001-plan.md          # Implementation plan
+│   └── F0001-tracking.yaml    # Story tracking (status, notes)
+└── archive/                   # Completed features (move folder here)
 ```
 
 ## Feature YAML Format
@@ -60,7 +60,8 @@ docs/agents/plans/
 id: F0001
 name: EPUB Parsing Service
 branch: feature/epub-parsing
-plan: docs/agents/plans/F0001-epub-parsing.md
+plan: features/F0001-epub-parsing/F0001-plan.md
+spec: features/F0001-epub-parsing/F0001-spec.md
 created: 2025-01-10
 
 validation:
@@ -99,12 +100,12 @@ stories:
 .prp/scripts/ralph.sh 20
 
 # With specific feature file
-.prp/scripts/ralph.sh 15 features/F0001-epub-parsing.yaml
+.prp/scripts/ralph.sh 15 features/F0001-epub-parsing/F0001-tracking.yaml
 ```
 
 ### Prerequisites
 
-1. Feature YAML at `features/F####-*.yaml`
+1. Feature tracking file at `features/F####-name/F####-tracking.yaml`
 2. Plan file referenced in YAML
 3. `ralph-prompt.md` in project root (copy from `.prp/templates/ralph-prompt.template.md`)
 4. Git repository initialized
@@ -191,7 +192,7 @@ When monitoring Ralph from within a Claude Code session, use ONLY these two comm
 tail -50 ralph.log
 
 # 2. Check story status (read the YAML file directly)
-# Use the Read tool on: features/F####-*.yaml
+# Use the Read tool on: features/F####-name/F####-tracking.yaml
 ```
 
 **Monitoring loop pattern:**
@@ -265,8 +266,10 @@ Good Codebase Patterns reduce repeated mistakes:
 /plan-feature "Add user registration"
 
 # 2. Review and approve plan (human reviews)
-# Plan created at: docs/agents/plans/F0002-user-registration.md
-# YAML created at: features/F0002-user-registration.yaml
+# Files created at: features/F0002-user-registration/
+#   - F0002-spec.md
+#   - F0002-plan.md
+#   - F0002-tracking.yaml
 
 # 3. Copy Ralph prompt template
 cp .prp/templates/ralph-prompt.template.md ralph-prompt.md

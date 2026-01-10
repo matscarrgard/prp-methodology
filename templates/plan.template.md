@@ -1,7 +1,7 @@
 # Feature: F0000 - [NAME]
 
-> Feature Spec: `features/specs/F0000-name.md` (if applicable)
-> Story Tracking: `features/F0000-name.yaml`
+> Feature Spec: `features/F0000-name/F0000-spec.md`
+> Story Tracking: `features/F0000-name/F0000-tracking.yaml`
 
 ## Problem Statement
 

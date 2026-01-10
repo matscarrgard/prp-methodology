@@ -74,7 +74,10 @@ Update this when you learn something reusable across ALL future work.
 - PRD: `docs/agents/prd.md` - Project scope and features
 - Backlog: `features/BACKLOG.md` - Feature specs and status
 - Progress: `features/progress.txt` - Iteration memory
-- Plans: `docs/agents/plans/` - Implementation plans
+- Features: `features/F####-name/` - Per-feature folders containing:
+  - `F####-spec.md` - Feature specification
+  - `F####-plan.md` - Implementation plan
+  - `F####-tracking.yaml` - Story tracking for Ralph
 
 ## Commands Reference
 
