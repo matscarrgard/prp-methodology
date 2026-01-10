@@ -1,51 +1,72 @@
 # PRD (Product Requirements Document)
 
-Create or update the project PRD with key decisions for scaffolding.
+Create a structured PRD from inputs (notes, ideas, requirements) or conversation.
 
 ## Input
 
-$ARGUMENTS - Optional: specific section to update (e.g., "technical", "scope")
+$ARGUMENTS - Optional: path to input files or folder with requirements/notes
 
 ## Process
 
-### Phase 1: Check Current State
+### Phase 1: Gather Inputs
 
-1. **Read existing PRD** (if exists)
-   - Check for PRD in docs directory
-   - Summarize current state: what's filled in, what's missing
+1. **Check for input files** (if $ARGUMENTS provided)
+   - Read specified files or folder
+   - Look for: requirements, notes, ideas, meeting notes, user stories
+   - Summarize what was found
 
-2. **Gather context** (if PRD is blank/new)
-   - Read `README.md` for project description
-   - Read any existing documentation
-   - Check project config for project name
+2. **Check existing PRD**
+   - Look for PRD in `docs/agents/prd.md` or `docs/prd.md`
+   - If exists, summarize current state
 
-### Phase 2: Collect Project Information
+3. **If no inputs provided**
+   - Ask user to describe the project/feature
+   - "What are you building? What problem does it solve?"
 
-3. **Core identity** (ask if not defined)
+### Phase 2: Process & Structure
+
+4. **Extract from inputs** (if messy notes provided)
+   - Identify project goals
+   - Extract features and requirements
+   - Note technical constraints mentioned
+   - Flag open questions or ambiguities
+
+5. **Clarify with user**
+   - Confirm understanding of core purpose
+   - Ask about unclear requirements
+   - Resolve ambiguities before documenting
+
+### Phase 3: Collect Missing Information
+
+6. **Core identity** (ask if not in inputs)
    - Project name
    - One-liner description
    - Problem statement (what problem does this solve?)
 
-4. **Technical decisions** (ask user)
-   - Architecture pattern
+7. **Technical decisions** (ask user)
+   - Architecture pattern (api-only, web-only, etc.)
    - Database choice
    - External services/integrations
    - Key technical constraints
 
-5. **MVP scope** (ask if not defined)
-   - 2-3 must-have features for v1
+8. **MVP scope** (prioritize from inputs)
+   - 3-5 must-have features for v1
    - What's explicitly out of scope?
 
-### Phase 3: Write PRD
+### Phase 4: Write PRD
 
-6. **Create/Update PRD file**
+9. **Create/Update PRD file** at `docs/agents/prd.md`
 
-   Structure:
    ```markdown
    # [Project Name] PRD
 
    ## Executive Summary
-   [One-paragraph description of what this project does]
+   [One-paragraph description of what this project does and why]
+
+   ---
+
+   ## Problem Statement
+   [What problem does this solve? Who has this problem?]
 
    ---
 
@@ -66,14 +87,27 @@ $ARGUMENTS - Optional: specific section to update (e.g., "technical", "scope")
 
    ## MVP Scope
 
-   ### In Scope
-   - Feature 1
-   - Feature 2
-   - Feature 3
+   ### In Scope (v1)
+   1. [Feature] - [brief description]
+   2. [Feature] - [brief description]
+   3. [Feature] - [brief description]
 
-   ### Out of Scope
-   - Thing 1
-   - Thing 2
+   ### Out of Scope (later versions)
+   - [Thing 1]
+   - [Thing 2]
+
+   ---
+
+   ## Feature Details
+
+   ### Feature 1: [Name]
+   **User Story**: As a [user], I want to [action] so that [benefit]
+   **Acceptance Criteria**:
+   - [ ] Criterion 1
+   - [ ] Criterion 2
+
+   ### Feature 2: [Name]
+   ...
 
    ---
 
@@ -88,24 +122,46 @@ $ARGUMENTS - Optional: specific section to update (e.g., "technical", "scope")
    ---
 
    ## Open Questions
+   - [questions to resolve before implementation]
 
-   - [questions to resolve]
+   ---
+
+   ## Source Materials
+   - [list of input files processed, if any]
    ```
 
-### Phase 4: Validate
+### Phase 5: Next Steps
 
-7. **Verify PRD completeness**
-   - Has Executive Summary
-   - Has Technical Decisions
-   - Has MVP Scope
+10. **Show workflow**
+    ```
+    PRD created! Next steps:
 
-8. **Show next step**
-   - "Run `/plan-feature` to plan your first feature"
+    1. Review and refine the PRD
+    2. Run /scaffold to create project structure (if not done)
+    3. Run /plan-feature to plan your first feature
+    ```
+
+## Usage Examples
+
+```bash
+# From conversation (interactive)
+/prd
+
+# From a folder of notes
+/prd inputs/
+
+# From specific files
+/prd requirements.md notes.txt
+
+# Update existing PRD
+/prd --update
+```
 
 ## Output
 
-- [ ] PRD created/updated
+- [ ] PRD created at `docs/agents/prd.md`
 - [ ] Executive Summary filled in
+- [ ] Problem Statement clear
 - [ ] Technical Decisions present
-- [ ] MVP Scope defined
-- [ ] Ready for feature planning
+- [ ] MVP Scope defined (3-5 features)
+- [ ] Ready for feature planning with `/plan-feature`
