@@ -7,12 +7,12 @@
 # Examples:
 #   ./ralph.sh                              # Default: 15 iterations, auto-detect feature
 #   ./ralph.sh 25                           # 25 iterations
-#   ./ralph.sh 20 features/F0001-auth.yaml  # Specific feature file
+#   ./ralph.sh 20 features/F0001-auth/F0001-tracking.yaml  # Specific feature file
 #
 # Prerequisites:
 #   - Git repository
 #   - claude CLI installed
-#   - Feature YAML file (features/F####-*.yaml or features/current.yaml)
+#   - Feature tracking file (features/F####-name/F####-tracking.yaml)
 #   - ralph-prompt.md in project root
 
 set -e
@@ -74,14 +74,11 @@ preflight_check() {
             exit 1
         fi
     else
-        # Auto-detect feature file
-        FEATURE_FILE=$(find features -maxdepth 1 -name "F[0-9][0-9][0-9][0-9]-*.yaml" 2>/dev/null | head -1)
+        # Auto-detect feature file (look in subdirectories)
+        FEATURE_FILE=$(find features -path "features/F[0-9][0-9][0-9][0-9]-*/*-tracking.yaml" 2>/dev/null | head -1)
         if [ -z "$FEATURE_FILE" ]; then
-            FEATURE_FILE="features/current.yaml"
-        fi
-        if [ ! -f "$FEATURE_FILE" ]; then
-            echo -e "${RED}Error: No feature file found${NC}"
-            echo "Create one with /plan-feature or manually at features/F####-name.yaml"
+            echo -e "${RED}Error: No feature tracking file found${NC}"
+            echo "Create one with /plan-feature at features/F####-name/F####-tracking.yaml"
             exit 1
         fi
     fi
