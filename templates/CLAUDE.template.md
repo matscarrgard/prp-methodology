@@ -63,7 +63,8 @@ Update this when you learn something reusable across ALL future work.
 ### Adding Features
 ```
 /prime            → Load context (checks PRD, progress.txt)
-/plan-feature     → Plan feature (references PRD for context)
+/create-features  → Create feature specs from PRD/conversation
+/plan-feature     → Plan feature (from spec or description)
 /execute          → Implement
 /validate         → Test
 /commit           → Ship
@@ -71,6 +72,7 @@ Update this when you learn something reusable across ALL future work.
 
 ### Key Files
 - PRD: `docs/agents/prd.md` - Project scope and features
+- Backlog: `features/BACKLOG.md` - Feature specs and status
 - Progress: `features/progress.txt` - Iteration memory
 - Plans: `docs/agents/plans/` - Implementation plans
 
@@ -81,7 +83,8 @@ Update this when you learn something reusable across ALL future work.
 | `/prd` | Create/update PRD from inputs or conversation |
 | `/scaffold` | Create project structure (language-specific) |
 | `/prime` | Load project context |
-| `/plan-feature` | Plan a feature (from PRD or description) |
+| `/create-features` | Create feature specs from PRD/conversation |
+| `/plan-feature` | Plan a feature (from spec or description) |
 | `/execute` | Execute implementation plan |
 | `/validate` | Run tests and lint |
 | `/commit` | Create git commit |
@@ -91,3 +94,10 @@ Update this when you learn something reusable across ALL future work.
 Using PRP methodology from `.prp/`:
 - Workflow: `.prp/instructions/WORKFLOW.md`
 - Story sizing: `.prp/instructions/STORY_SIZING.md`
+
+## Subtrees
+
+| Prefix | Remote | Sync |
+|--------|--------|------|
+| `.prp/` | `prp-method` | `git subtree pull --prefix=.prp prp-method main --squash` (pull first!) |
+|        |              | `git subtree push --prefix=.prp prp-method main` |
