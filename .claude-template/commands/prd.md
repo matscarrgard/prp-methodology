@@ -1,0 +1,1 @@
+../../.prp/commands/prd.md
