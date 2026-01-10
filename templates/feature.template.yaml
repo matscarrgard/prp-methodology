@@ -25,12 +25,16 @@ validation:
   # typecheck: uv run mypy src/
 
 stories:
+  # NOTE: Each story should include its own tests as criteria.
+  # Don't batch tests at the end - verify each story independently.
+
   - id: F0000-01
     title: First story title
     description: Brief description of what this story accomplishes
     criteria:
       - Specific, verifiable criterion
       - Another criterion
+      - "Tests: test_first_story_* pass"  # Story-specific tests
       - Lint passes
     priority: 1
     status: pending
@@ -42,7 +46,8 @@ stories:
     description: Brief description
     criteria:
       - Criterion 1
-      - Tests pass
+      - "Tests: test_second_story_* pass"  # Story-specific tests
+      - Lint passes
     priority: 2
     status: pending
     attempts: 0

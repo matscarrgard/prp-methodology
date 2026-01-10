@@ -185,3 +185,32 @@ Load available pattern documentation for the project's tech stack.
 - **Task granularity**: 5-15 tasks total
 - **Each task**: Should be completable in one focused session
 - **Validation**: Must be runnable commands, not vague descriptions
+
+## Story Testing Guidelines (IMPORTANT)
+
+**Each story must include its own tests as acceptance criteria.**
+
+Do NOT create separate "Write Tests" stories at the end of a feature. Instead:
+
+```yaml
+# GOOD: Tests included in each story
+- id: F0004-01
+  title: Create Reader Page
+  criteria:
+    - GET /read/{book_id} returns reader page
+    - Page displays book title and chapter content
+    - "Tests: test_reader_page_* pass"
+    - Lint passes
+
+# BAD: Tests batched at end
+- id: F0004-07
+  title: Write Reader Tests   # Don't do this
+  criteria:
+    - All reader tests pass
+```
+
+**Why per-story tests?**
+- Bugs caught immediately (not compounded)
+- Clear attribution (know which story broke)
+- Fresh context (fix in same iteration)
+- Each story independently verified

@@ -26,16 +26,19 @@ Execute a SINGLE story from the current feature. One story per iteration, fresh 
 - If ALL stories have `status: complete` → output `FEATURE_COMPLETE`
 - If ALL remaining stories have `status: blocked` → output `ALL_BLOCKED`
 
-### 2. Implement
+### 2. Implement + Test
 - Follow patterns from CLAUDE.md
 - Apply learnings from progress.txt Codebase Patterns
 - Keep changes focused on JUST this story
+- **Write tests for this story** - each story should have its own tests
 - Check the story's `criteria` - each must be satisfied
 
 ### 3. Verify
-- Run validation commands from the feature YAML's `validation` section
-- Run any story-specific test commands in criteria
+- Run **story-specific tests first** (from criteria, e.g., `pytest tests/ -k "test_story_name"`)
+- Run validation commands from the feature YAML's `validation` section (lint, full test suite)
 - Fix any failures (up to 3 attempts)
+
+**Testing Rule**: Don't defer tests to a later story. Each story is verified independently.
 
 ### 4. On SUCCESS
 Update the feature YAML:

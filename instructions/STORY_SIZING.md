@@ -101,21 +101,21 @@ Split if story has:
 
 ## Story Template
 
-```json
-{
-  "id": "FEAT-001",
-  "title": "Add User model",
-  "description": "Create SQLAlchemy User model with email and password_hash",
-  "criteria": [
-    "User model in src/app/models/user.py",
-    "Fields: id, email (unique), password_hash, created_at",
-    "Migration created and runs successfully",
-    "Tests pass: pytest tests/unit/test_user_model.py"
-  ],
-  "priority": 1,
-  "size": "S"
-}
+```yaml
+- id: FEAT-001
+  title: Add User model
+  description: Create SQLAlchemy User model with email and password_hash
+  criteria:
+    - User model in src/app/models/user.py
+    - "Fields: id, email (unique), password_hash, created_at"
+    - Migration created and runs successfully
+    - "Tests: test_user_model_* pass"  # IMPORTANT: Include tests in EVERY story
+    - Lint passes
+  priority: 1
+  status: pending
 ```
+
+**Critical**: Each story includes its own tests as criteria. Don't batch tests at the end of a feature.
 
 ## Acceptance Criteria Rules
 

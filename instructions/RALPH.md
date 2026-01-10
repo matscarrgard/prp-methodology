@@ -165,6 +165,27 @@ Keep stories SMALL for Ralph:
 - Independent (can commit separately)
 - 2-3 sentence description max
 
+### Tests Per Story (IMPORTANT)
+Each story should include its own tests as acceptance criteria:
+
+```yaml
+- id: F0001-03
+  title: Add user registration endpoint
+  criteria:
+    - POST /api/users creates user
+    - Returns 201 with user ID
+    - "Tests: test_user_registration_* pass"  # Story-specific tests
+    - Lint passes
+```
+
+**Why not batch tests at the end?**
+- Each story verified immediately (bugs caught early)
+- Clear attribution (know which story broke)
+- Fresh context per story (fix immediately)
+- Story criteria become verifiable ("tests pass" vs "looks good")
+
+**Anti-pattern**: Separate "Write Tests" stories at end of feature.
+
 ### Memory Discipline
 - Progress.txt Codebase Patterns read FIRST
 - Learnings appended IMMEDIATELY after story
