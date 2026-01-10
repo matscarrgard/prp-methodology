@@ -93,15 +93,32 @@ claude
 | React | - | Coming soon |
 | Go | - | Coming soon |
 
-## Updating Methodology
+Boilerplates are added as subtrees at `.boilerplate/` and files are copied to root.
+This keeps your project decoupled while allowing template updates.
+
+## Updating Templates
+
+Both methodology (`.prp/`) and boilerplate (`.boilerplate/`) are git subtrees.
 
 ```bash
-# Pull latest changes
+# Pull latest methodology
 git subtree pull --prefix=.prp prp-method main --squash
 
-# Push improvements back
-git subtree push --prefix=.prp prp-method main
+# Pull latest boilerplate (if using Python)
+git subtree pull --prefix=.boilerplate py-boilerplate main --squash
 ```
+
+To push improvements back:
+
+```bash
+# Push methodology improvements
+git subtree push --prefix=.prp prp-method main
+
+# Push boilerplate improvements
+git subtree push --prefix=.boilerplate py-boilerplate main
+```
+
+**Note**: Always pull before making changes to avoid conflicts.
 
 ## Key Files
 

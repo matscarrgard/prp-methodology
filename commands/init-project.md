@@ -97,35 +97,53 @@ Options:
    git subtree add --prefix=.boilerplate py-boilerplate main --squash
    ```
 
-2. **Copy boilerplate files to root**
+2. **Copy boilerplate files to root** (decoupled from template)
    ```bash
-   # Copy all boilerplate files (except .git)
-   cp -r .boilerplate/* .
-   cp .boilerplate/.* . 2>/dev/null || true
+   # Copy project files
+   cp .boilerplate/CLAUDE.md .
+   cp .boilerplate/pyproject.toml .
+   cp .boilerplate/.gitignore . 2>/dev/null || true
+   cp .boilerplate/.env.example . 2>/dev/null || true
+   cp -r .boilerplate/src .
+   cp -r .boilerplate/tests .
 
-   # Copy the local /scaffold command (not symlinked)
+   # Copy docs/guides
+   mkdir -p docs/agents/guides
+   cp -r .boilerplate/docs/agents/guides/* docs/agents/guides/
+
+   # Copy the scaffold command (not symlinked - project-specific)
    cp .boilerplate/.claude/commands/scaffold.md .claude/commands/
    ```
 
-3. **Clean up**
-   ```bash
-   rm -rf .boilerplate
-   git remote remove py-boilerplate
-   ```
+3. **Keep .boilerplate/** - DO NOT remove it. It stays as a subtree for:
+   - Pulling template updates: `git subtree pull --prefix=.boilerplate py-boilerplate main --squash`
+   - Pushing improvements back: `git subtree push --prefix=.boilerplate py-boilerplate main`
 
-4. **Install dependencies**
+4. **Add .boilerplate to .gitignore considerations**
+   - The directory IS tracked (it's a subtree)
+   - Files copied to root are independent of the template
+   - Updates to guides should be made in `.boilerplate/` then copied out
+
+5. **Install dependencies**
    ```bash
    uv sync
    ```
 
-5. **Inform user**:
+6. **Inform user**:
    ```
    Python boilerplate added!
+
+   Files copied to project root (independent of template).
+   Template kept at .boilerplate/ for future updates.
 
    Next steps:
    1. Edit CLAUDE.md with your project name/description
    2. Run /scaffold to create project structure (api-only, web-only, etc.)
    3. Run /prime to verify setup
+
+   To update template later:
+   - Pull: git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+   - Push: git subtree push --prefix=.boilerplate py-boilerplate main
    ```
 
 #### If None selected:
@@ -195,3 +213,42 @@ If already initialized, `/init-project` will:
 - Check current state
 - Offer to refresh symlinks
 - Offer to re-pull boilerplate (with confirmation)
+
+## Updating Templates
+
+Both `.prp/` (methodology) and `.boilerplate/` (language-specific) are git subtrees.
+
+### Pull Latest Updates
+
+**Always pull before making changes** to avoid conflicts:
+
+```bash
+# Update methodology
+git subtree pull --prefix=.prp prp-method main --squash
+
+# Update boilerplate (if using Python)
+git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+```
+
+### Push Improvements Back
+
+If you improve guides, patterns, or templates:
+
+```bash
+# Push methodology improvements
+git subtree push --prefix=.prp prp-method main
+
+# Push boilerplate improvements
+git subtree push --prefix=.boilerplate py-boilerplate main
+```
+
+### Workflow for Template Updates
+
+1. **Pull latest** from upstream
+2. **Make changes** in `.prp/` or `.boilerplate/`
+3. **Test changes** in your project
+4. **Commit** your changes locally
+5. **Push back** to upstream repo
+
+Note: Changes in `.boilerplate/` don't automatically update files at root.
+If you improve a guide, manually copy it: `cp .boilerplate/docs/agents/guides/x.md docs/agents/guides/`
