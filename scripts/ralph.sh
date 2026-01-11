@@ -20,6 +20,7 @@ set -e
 # Get script directory for finding helper scripts
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATUS_SCRIPT="$SCRIPT_DIR/feature-status.py"
+SCREENSHOT_SCRIPT="$SCRIPT_DIR/capture-screenshots.py"
 
 # Configuration
 MAX_ITERATIONS=${1:-15}
@@ -27,6 +28,13 @@ FEATURE_FILE=${2:-""}  # Empty = auto-detect
 PROMPT_FILE="ralph-prompt.md"
 PROGRESS_FILE="features/progress.txt"
 LOG_FILE="ralph.log"
+
+# Test scope commands
+declare -A TEST_COMMANDS
+TEST_COMMANDS[unit]="uv run pytest tests/unit/ -x -q"
+TEST_COMMANDS[integration]="uv run pytest tests/integration/ -x -q"
+TEST_COMMANDS[api]="uv run pytest tests/integration/ -x -q -k 'route or endpoint'"
+TEST_COMMANDS[ui]="uv run pytest tests/e2e/ --e2e -x -q"
 
 # Colors for output
 RED='\033[0;31m'
@@ -137,6 +145,42 @@ get_complete_count() {
     python3 "$STATUS_SCRIPT" complete "$FEATURE_FILE" 2>/dev/null
 }
 
+get_story_testing() {
+    # Get testing requirements for a story (comma-separated: unit,ui,integration)
+    local story_id=$1
+    python3 "$STATUS_SCRIPT" testing "$story_id" "$FEATURE_FILE" 2>/dev/null
+}
+
+get_feature_dir() {
+    # Extract feature directory from feature file path
+    dirname "$FEATURE_FILE"
+}
+
+# Post-story validation for UI stories
+run_ui_validation() {
+    local story_id=$1
+    local feature_dir=$(get_feature_dir)
+    local testing=$(get_story_testing "$story_id")
+
+    # Check if UI testing is required
+    if [[ "$testing" == *"ui"* ]]; then
+        log "UI validation required for $story_id"
+
+        # Check if screenshots exist
+        local screenshot_dir="$feature_dir/screenshots/$story_id"
+        if [ -d "$screenshot_dir" ] && [ "$(ls -A $screenshot_dir 2>/dev/null)" ]; then
+            log "Screenshots found in $screenshot_dir"
+        else
+            log "Capturing screenshots for $story_id..."
+            if [ -f "$SCREENSHOT_SCRIPT" ]; then
+                python3 "$SCREENSHOT_SCRIPT" "$feature_dir" "$story_id" --start-server 2>&1 | tee -a "$LOG_FILE"
+            else
+                echo -e "${YELLOW}Warning: Screenshot script not found${NC}"
+            fi
+        fi
+    fi
+}
+
 # Print current status
 print_status() {
     echo ""
@@ -206,6 +250,15 @@ main() {
         # Using --dangerously-skip-permissions since hooks handle safety
         if ! claude --dangerously-skip-permissions -p "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE"; then
             log "Claude exited with error"
+        fi
+
+        # Post-iteration validation: check if story just completed needs UI validation
+        if [ -n "$NEXT_STORY" ]; then
+            # Check if the story was just completed
+            local story_status=$(python3 "$STATUS_SCRIPT" get "$NEXT_STORY" "$FEATURE_FILE" 2>/dev/null | grep "^STATUS=" | cut -d= -f2)
+            if [ "$story_status" = "complete" ]; then
+                run_ui_validation "$NEXT_STORY"
+            fi
         fi
 
         # Check for completion (all stories done)

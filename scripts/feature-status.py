@@ -17,15 +17,17 @@ Commands:
     all-done    Exit 0 if all complete, exit 1 otherwise
     all-blocked Exit 0 if all remaining are blocked, exit 1 otherwise
     get <id>    Print story details as KEY=VALUE pairs
+    testing <id>  Print testing requirements for a story (unit,integration,api,ui)
+    feature-testing  Print aggregated testing requirements for all stories
 
 Examples:
     ./feature-status.py next features/F0001-epub-parsing/F0001-tracking.yaml
     ./feature-status.py status
     ./feature-status.py all-done && echo "Feature complete!"
+    ./feature-status.py testing F0004c-04
 """
 
 import sys
-import re
 from pathlib import Path
 
 
@@ -33,10 +35,15 @@ def parse_yaml_simple(content: str) -> dict:
     """
     Simple YAML parser for our feature format.
     Handles only the subset we need (no anchors, complex types, etc.)
+
+    Supports:
+    - stories with id, title, status, priority, criteria (list), testing (list)
+    - ui_validation with pages (list), viewports (list), capture, analyze
     """
     result = {"stories": []}
     current_story = None
     current_list_key = None
+    current_dict_key = None
     indent_stack = []
 
     lines = content.split("\n")
@@ -72,14 +79,28 @@ def parse_yaml_simple(content: str) -> dict:
                         # New story
                         if current_story:
                             result["stories"].append(current_story)
-                        current_story = {"id": value, "criteria": []}
+                        current_story = {"id": value, "criteria": [], "testing": ["unit"]}
                     elif current_story:
                         current_story[key] = value
                 elif current_list_key == "criteria" and current_story:
                     current_story["criteria"].append(item_content.strip('"').strip("'"))
+                elif current_list_key == "testing" and current_story:
+                    current_story.setdefault("testing", []).append(item_content.strip('"').strip("'"))
+                elif current_list_key == "pages" and current_story and "ui_validation" in current_story:
+                    current_story["ui_validation"].setdefault("pages", []).append(item_content.strip('"').strip("'"))
+                elif current_list_key == "viewports" and current_story and "ui_validation" in current_story:
+                    try:
+                        current_story["ui_validation"].setdefault("viewports", []).append(int(item_content))
+                    except ValueError:
+                        pass
 
             elif current_list_key == "criteria" and current_story:
                 current_story["criteria"].append(item_content.strip('"').strip("'"))
+            elif current_list_key == "testing" and current_story:
+                # Handle inline list format: testing: [unit, ui]
+                current_story.setdefault("testing", []).append(item_content.strip('"').strip("'"))
+            elif current_list_key == "pages" and current_story:
+                current_story.setdefault("ui_validation", {}).setdefault("pages", []).append(item_content.strip('"').strip("'"))
 
             i += 1
             continue
@@ -95,12 +116,53 @@ def parse_yaml_simple(content: str) -> dict:
                 indent_stack.append(("stories", indent))
             elif key == "criteria":
                 current_list_key = "criteria"
+            elif key == "testing":
+                current_list_key = "testing"
+                # Handle inline list format: testing: [unit, ui]
+                if value.startswith("[") and value.endswith("]"):
+                    items = [v.strip().strip('"').strip("'") for v in value[1:-1].split(",")]
+                    if current_story:
+                        current_story["testing"] = [i for i in items if i]
+                    current_list_key = None
+                elif current_story:
+                    current_story["testing"] = []
+            elif key == "ui_validation":
+                current_dict_key = "ui_validation"
+                if current_story:
+                    current_story["ui_validation"] = {}
+            elif key == "pages":
+                current_list_key = "pages"
+                # Handle inline list format: pages: [/library, /about]
+                if value.startswith("[") and value.endswith("]"):
+                    items = [v.strip().strip('"').strip("'") for v in value[1:-1].split(",")]
+                    if current_story and "ui_validation" in current_story:
+                        current_story["ui_validation"]["pages"] = [i for i in items if i]
+                    current_list_key = None
+            elif key == "viewports":
+                current_list_key = "viewports"
+                # Handle inline list format: viewports: [375, 768, 1280]
+                if value.startswith("[") and value.endswith("]"):
+                    try:
+                        items = [int(v.strip()) for v in value[1:-1].split(",") if v.strip()]
+                        if current_story and "ui_validation" in current_story:
+                            current_story["ui_validation"]["viewports"] = items
+                    except ValueError:
+                        pass
+                    current_list_key = None
             elif key == "validation":
                 current_list_key = "validation"
+                current_dict_key = None
                 result["validation"] = {}
             elif key == "summary":
                 current_list_key = "summary"
+                current_dict_key = None
                 result["summary"] = {}
+            elif current_dict_key == "ui_validation" and current_story and value:
+                # Handle ui_validation sub-keys like capture, analyze
+                if value.lower() in ("true", "false"):
+                    current_story["ui_validation"][key] = value.lower() == "true"
+                else:
+                    current_story["ui_validation"][key] = value
             elif current_list_key == "validation" and value:
                 result.setdefault("validation", {})[key] = value
             elif current_list_key == "summary" and value:
@@ -149,7 +211,7 @@ def load_feature(path: Path | None = None) -> dict:
         path = find_feature_file()
 
     if path is None or not path.exists():
-        print(f"Error: Feature file not found", file=sys.stderr)
+        print("Error: Feature file not found", file=sys.stderr)
         sys.exit(1)
 
     content = path.read_text()
@@ -208,8 +270,43 @@ def print_story(story: dict):
         if key == "criteria":
             # Join criteria with |
             print(f"CRITERIA={' | '.join(value)}")
+        elif key == "testing":
+            # Join testing with comma
+            print(f"TESTING={','.join(value)}")
+        elif key == "ui_validation":
+            # Flatten ui_validation
+            for k, v in value.items():
+                if isinstance(v, list):
+                    print(f"UI_{k.upper()}={','.join(str(x) for x in v)}")
+                else:
+                    print(f"UI_{k.upper()}={v}")
         else:
             print(f"{key.upper()}={value}")
+
+
+def get_story_testing(feature: dict, story_id: str) -> list[str]:
+    """Get testing requirements for a story."""
+    for story in feature.get("stories", []):
+        if story.get("id") == story_id:
+            return story.get("testing", ["unit"])
+    return ["unit"]
+
+
+def get_feature_testing(feature: dict) -> list[str]:
+    """Get aggregated testing requirements for all stories."""
+    all_testing = set()
+    for story in feature.get("stories", []):
+        testing = story.get("testing", ["unit"])
+        all_testing.update(testing)
+    return sorted(list(all_testing))
+
+
+def get_story_ui_validation(feature: dict, story_id: str) -> dict:
+    """Get UI validation config for a story."""
+    for story in feature.get("stories", []):
+        if story.get("id") == story_id:
+            return story.get("ui_validation", {})
+    return {}
 
 
 def main():
@@ -277,6 +374,42 @@ def main():
         validation = feature.get("validation", {})
         for key, cmd in validation.items():
             print(f"{key.upper()}={cmd}")
+
+    elif command == "testing":
+        if len(sys.argv) < 3:
+            print("Error: testing requires story ID", file=sys.stderr)
+            sys.exit(1)
+        story_id = sys.argv[2] if len(sys.argv) == 3 else sys.argv[3]
+        testing = get_story_testing(feature, story_id)
+        print(",".join(testing))
+
+    elif command == "feature-testing":
+        testing = get_feature_testing(feature)
+        print(",".join(testing))
+
+    elif command == "ui-validation":
+        if len(sys.argv) < 3:
+            print("Error: ui-validation requires story ID", file=sys.stderr)
+            sys.exit(1)
+        story_id = sys.argv[2] if len(sys.argv) == 3 else sys.argv[3]
+        ui_val = get_story_ui_validation(feature, story_id)
+        if ui_val:
+            pages = ui_val.get("pages", ["/", "/library", "/about"])
+            viewports = ui_val.get("viewports", [375, 768, 1280])
+            print(f"PAGES={','.join(pages)}")
+            print(f"VIEWPORTS={','.join(str(v) for v in viewports)}")
+            print(f"CAPTURE={ui_val.get('capture', 'always')}")
+            print(f"ANALYZE={ui_val.get('analyze', True)}")
+        else:
+            # Defaults for stories with ui testing
+            testing = get_story_testing(feature, story_id)
+            if "ui" in testing:
+                print("PAGES=/,/library,/about")
+                print("VIEWPORTS=375,768,1280")
+                print("CAPTURE=always")
+                print("ANALYZE=true")
+            else:
+                sys.exit(1)  # No UI validation needed
 
     else:
         print(f"Unknown command: {command}", file=sys.stderr)

@@ -1,0 +1,110 @@
+# Feature Tracking YAML Schema (v2 with Testing Categories)
+# This is a reference example showing all available fields
+
+feature_id: F0001
+feature_name: Example Feature
+status: in_progress
+created: 2024-01-15
+
+# Plan file location
+plan: features/F0001-example/F0001-plan.md
+
+# Validation commands run at feature completion
+validation:
+  lint: uv run ruff check src/ --fix
+  tests: uv run pytest tests/ -x
+
+stories:
+  # Story with default testing (unit only)
+  - id: F0001-01
+    title: Add backend utility function
+    status: pending
+    priority: P0
+    testing: [unit]  # Default - just unit tests
+    criteria:
+      - Create utility function in core/utils.py
+      - Add unit tests in tests/unit/test_utils.py
+      - Lint passes
+
+  # Story with integration testing
+  - id: F0001-02
+    title: Add database service
+    status: pending
+    priority: P0
+    testing: [unit, integration]  # Needs integration tests
+    criteria:
+      - Create service class
+      - Add integration tests with test database
+      - Lint passes
+
+  # Story with API testing
+  - id: F0001-03
+    title: Add REST endpoint
+    status: pending
+    priority: P1
+    testing: [unit, integration, api]  # Needs route testing
+    criteria:
+      - Add route in routes/
+      - Test endpoint returns correct response
+      - Test error handling
+      - Lint passes
+
+  # Story with UI testing (includes screenshots)
+  - id: F0001-04
+    title: Add UI component
+    status: pending
+    priority: P1
+    testing: [unit, ui]  # Needs Playwright e2e tests
+    criteria:
+      - Create component
+      - Add e2e tests
+      - Visual regression passes
+      - Lint passes
+
+  # Story with full UI validation config
+  - id: F0001-05
+    title: Redesign page layout
+    status: pending
+    priority: P2
+    testing: [unit, ui]
+    ui_validation:
+      pages: ["/", "/library", "/about"]
+      viewports: [375, 768, 1280]
+      capture: always
+      analyze: true
+    criteria:
+      - Update layout component
+      - Mobile responsive at 375px
+      - Desktop layout at 1280px
+      - All e2e tests pass
+      - Screenshot analysis passes
+      - Lint passes
+
+  # Full-stack story
+  - id: F0001-06
+    title: Add feature with backend and UI
+    status: pending
+    priority: P2
+    testing: [unit, integration, api, ui]  # All test types
+    ui_validation:
+      pages: ["/feature-page"]
+      viewports: [375, 1280]
+      capture: always
+      analyze: true
+    criteria:
+      - Add backend service
+      - Add API endpoint
+      - Add UI component
+      - All tests pass
+      - Screenshot analysis passes
+      - Lint passes
+
+notes: |
+  Testing categories:
+  - unit: Isolated component tests (tests/unit/)
+  - integration: Cross-component, DB, services (tests/integration/)
+  - api: HTTP endpoint testing (tests/integration/ with route markers)
+  - ui: Playwright visual/interaction testing (tests/e2e/)
+
+  UI validation captures screenshots at specified viewports and
+  analyzes them for visual issues before committing.
