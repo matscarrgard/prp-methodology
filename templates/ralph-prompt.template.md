@@ -131,3 +131,21 @@ When outputting `FEATURE_COMPLETE` or `ALL_BLOCKED`:
 2. Do NOT attempt to plan or start the next feature
 3. Do NOT ask questions or request input
 4. Stop immediately - the outer loop will handle next steps
+
+## E2E Validation (After Feature Completion)
+
+After the outer loop receives `FEATURE_COMPLETE`, it should trigger E2E validation:
+
+1. **Run automated E2E tests** (if any exist for the feature):
+   ```bash
+   uv run pytest tests/e2e/ --e2e -x
+   ```
+
+2. **Run interactive UI validation** using `/validate-ui`:
+   - Tests functional flows with Playwright MCP
+   - Critically evaluates design quality
+   - Generates report with screenshots
+
+3. **If issues found**: Create follow-up feature (e.g., F0004b) for fixes
+
+See `.prp/commands/validate-ui.md` for the interactive validation process.

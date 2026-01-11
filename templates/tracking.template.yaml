@@ -1,0 +1,56 @@
+# Feature: F{NNNN} - {Feature Name}
+#
+# This file tracks story status for Ralph autonomous execution.
+# The detailed implementation plan is in the referenced plan file.
+#
+# Status values: pending | in_progress | complete | blocked
+
+id: F{NNNN}
+name: {Feature Name}
+branch: main
+plan: features/F{NNNN}-{name}/F{NNNN}-plan.md
+spec: features/F{NNNN}-{name}/F{NNNN}-spec.md
+created: {YYYY-MM-DD}
+
+# Validation commands (run after each story)
+validation:
+  lint: uv run ruff check src/ --fix
+  test: uv run pytest tests/ -x
+
+stories:
+  # NOTE: Each story includes its own tests as criteria.
+
+  - id: F{NNNN}-01
+    title: {Story Title}
+    description: {Brief description}
+    criteria:
+      - {File or component created/modified}
+      - {Functionality implemented}
+      - "Tests: test_{feature}_* pass"
+      - Lint passes
+    priority: 1
+    status: pending
+    attempts: 0
+    notes: ""
+
+  # Add more stories as needed...
+
+# E2E Validation (optional, for UI features)
+# Uncomment and populate if this feature has UI deliverables
+# e2e_validation:
+#   flows:
+#     - name: "{Flow name}"
+#       steps:
+#         - Navigate to /path
+#         - Click element
+#         - Verify expected state
+#   design_screens:
+#     - /path (description)
+#     - /other-path (description)
+
+# Completion tracking
+summary:
+  total: 0
+  complete: 0
+  blocked: 0
+  pending: 0
