@@ -71,28 +71,35 @@ Before running Ralph, ensure:
 
 ### Phase 3: Execute
 
-6. **Run Ralph**
+6. **Run Ralph in background**
    ```bash
    .prp/scripts/ralph.sh $MAX_ITERATIONS $TRACKING_FILE
    ```
 
-   This will:
+   Run this command with `run_in_background: true` so you can monitor progress.
+
+   The script will:
    - Create checkpoint commit
    - Loop through stories
    - Update YAML status after each
    - Commit after each successful story
    - Stop when all complete or max iterations
 
-### Phase 4: Monitor (Optional)
+### Phase 4: Monitor
 
-7. **Provide monitoring commands**
+7. **Monitor progress with sleep/tail loop**
    ```bash
-   # Watch progress in another terminal
-   tail -f ralph.log
+   # Check every 60-90 seconds
+   sleep 60 && tail -40 ralph.log
+   ```
 
+   Keep running this pattern until Ralph completes. Also useful:
+   ```bash
    # Check story status
    uv run python .prp/scripts/feature-status.py status $TRACKING_FILE
    ```
+
+   User can also monitor in another terminal with `tail -f ralph.log`.
 
 ## Output
 
