@@ -57,27 +57,21 @@ Before running Ralph, ensure:
    - Check plan file exists
    - Check `.prp/scripts/ralph.sh` exists
 
-4. **Setup ralph-prompt.md**
-   If `ralph-prompt.md` doesn't exist in project root:
-   ```bash
-   cp .prp/templates/ralph-prompt.template.md ralph-prompt.md
-   ```
-
 ### Phase 2: Configure
 
-5. **Display configuration**
+4. **Display configuration**
    Show user:
    - Feature ID and name
    - Number of stories (pending/complete/blocked)
    - Max iterations
    - Estimated cost range
 
-6. **Confirm execution**
+5. **Confirm execution**
    Ask user to confirm before starting autonomous loop.
 
 ### Phase 3: Execute
 
-7. **Run Ralph**
+6. **Run Ralph**
    ```bash
    .prp/scripts/ralph.sh $MAX_ITERATIONS $TRACKING_FILE
    ```
@@ -91,13 +85,13 @@ Before running Ralph, ensure:
 
 ### Phase 4: Monitor (Optional)
 
-8. **Provide monitoring commands**
+7. **Provide monitoring commands**
    ```bash
    # Watch progress in another terminal
    tail -f ralph.log
 
    # Check story status
-   .prp/scripts/feature-status.py status $TRACKING_FILE
+   uv run python .prp/scripts/feature-status.py status $TRACKING_FILE
    ```
 
 ## Output
@@ -114,7 +108,7 @@ Check results:
 git log --oneline -10
 
 # Check final status
-.prp/scripts/feature-status.py status features/F####-name/F####-tracking.yaml
+uv run python .prp/scripts/feature-status.py status features/F####-name/F####-tracking.yaml
 
 # Run validation
 /validate

@@ -13,28 +13,21 @@
 #   - Git repository
 #   - claude CLI installed
 #   - Feature tracking file (features/F####-name/F####-tracking.yaml)
-#   - ralph-prompt.md in project root
 
 set -e
 
-# Get script directory for finding helper scripts
+# Get script directory for finding helper scripts and templates
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PRP_DIR="$(dirname "$SCRIPT_DIR")"
 STATUS_SCRIPT="$SCRIPT_DIR/feature-status.py"
 SCREENSHOT_SCRIPT="$SCRIPT_DIR/capture-screenshots.py"
 
 # Configuration
 MAX_ITERATIONS=${1:-15}
 FEATURE_FILE=${2:-""}  # Empty = auto-detect
-PROMPT_FILE="ralph-prompt.md"
+PROMPT_FILE="$PRP_DIR/templates/ralph-prompt.template.md"
 PROGRESS_FILE="features/progress.txt"
 LOG_FILE="ralph.log"
-
-# Test scope commands
-declare -A TEST_COMMANDS
-TEST_COMMANDS[unit]="uv run pytest tests/unit/ -x -q"
-TEST_COMMANDS[integration]="uv run pytest tests/integration/ -x -q"
-TEST_COMMANDS[api]="uv run pytest tests/integration/ -x -q -k 'route or endpoint'"
-TEST_COMMANDS[ui]="uv run pytest tests/e2e/ --e2e -x -q"
 
 # Colors for output
 RED='\033[0;31m'
@@ -59,7 +52,6 @@ preflight_check() {
     # Check for prompt file
     if [ ! -f "$PROMPT_FILE" ]; then
         echo -e "${RED}Error: Prompt file not found: $PROMPT_FILE${NC}"
-        echo "Copy from .prp/templates/ralph-prompt.template.md or create your own."
         exit 1
     fi
 

@@ -33,6 +33,15 @@ Execute a SINGLE story from the current feature. One story per iteration, fresh 
 - **Write tests for this story** - each story should have its own tests
 - Check the story's `criteria` - each must be satisfied
 
+**Testing Guidelines (avoid over-testing):**
+- Test the **contract**, not the implementation
+- Happy path + key error cases only (validation errors, not found, edge cases)
+- 1-2 tests per simple class (e.g., exceptions, dataclasses)
+- Use **parameterized tests** for similar cases (e.g., multiple aspect ratios = 1 test, not 7)
+- Skip integration tests if unit tests already cover the logic
+- Internal code needs less testing than system boundaries
+- Aim for ~10-15 tests per story, not 25+
+
 ### 3. Verify
 - Run **story-specific tests first** (from criteria, e.g., `pytest tests/ -k "test_story_name"`)
 - Run validation commands from the feature YAML's `validation` section (lint, full test suite)
