@@ -29,13 +29,6 @@ PROMPT_FILE="ralph-prompt.md"
 PROGRESS_FILE="features/progress.txt"
 LOG_FILE="ralph.log"
 
-# Test scope commands
-declare -A TEST_COMMANDS
-TEST_COMMANDS[unit]="uv run pytest tests/unit/ -x -q"
-TEST_COMMANDS[integration]="uv run pytest tests/integration/ -x -q"
-TEST_COMMANDS[api]="uv run pytest tests/integration/ -x -q -k 'route or endpoint'"
-TEST_COMMANDS[ui]="uv run pytest tests/e2e/ --e2e -x -q"
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
