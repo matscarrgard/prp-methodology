@@ -136,10 +136,14 @@ Output EXACTLY ONE at the end of your work:
 ## On Feature Completion
 
 When outputting `FEATURE_COMPLETE` or `ALL_BLOCKED`:
-1. Output the marker and a brief summary
-2. Do NOT attempt to plan or start the next feature
-3. Do NOT ask questions or request input
-4. Stop immediately - the outer loop will handle next steps
+1. **Archive the Ralph log** to the feature folder:
+   ```bash
+   cp ralph.log features/F####-*/F####-ralph.log
+   ```
+2. Output the marker and a brief summary
+3. Do NOT attempt to plan or start the next feature
+4. Do NOT ask questions or request input
+5. Stop immediately - the outer loop will handle next steps
 
 ## E2E Validation (After Feature Completion)
 
