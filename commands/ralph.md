@@ -32,46 +32,31 @@ Each iteration:
 
 ## Prerequisites
 
-Before running Ralph, ensure:
-1. Feature has a tracking YAML at `features/F####-name/F####-tracking.yaml`
-2. Feature has a plan at `features/F####-name/F####-plan.md`
-3. Stories are defined with clear acceptance criteria
+Feature must have been planned with `/plan-feature` which creates:
+- `features/F####-name/F####-tracking.yaml`
+- `features/F####-name/F####-plan.md`
+
+**Do NOT run bash commands to verify these exist** - if `/plan-feature` was run, they exist.
 
 ## Process
 
-### Phase 1: Setup
+### Phase 1: Configure
 
-1. **Parse arguments**
-   - Extract feature ID from arguments
-   - Extract optional max iterations (default: 15)
+1. **Read the tracking YAML** to get story counts
+   - Use the Read tool on `features/F####-name/F####-tracking.yaml`
 
-2. **Locate feature files**
-   ```bash
-   # Find feature folder
-   FEATURE_DIR=$(ls -d features/F${ID}-* 2>/dev/null | head -1)
-   TRACKING_FILE="$FEATURE_DIR/F${ID}-tracking.yaml"
-   ```
-
-3. **Verify prerequisites**
-   - Check tracking YAML exists
-   - Check plan file exists
-   - Check `.prp/scripts/ralph.sh` exists
-
-### Phase 2: Configure
-
-4. **Display configuration**
-   Show user:
+2. **Display configuration** to user:
    - Feature ID and name
    - Number of stories (pending/complete/blocked)
-   - Max iterations
+   - Max iterations (default: 15)
    - Estimated cost range
 
-5. **Confirm execution**
+3. **Confirm execution**
    Ask user to confirm before starting autonomous loop.
 
-### Phase 3: Execute
+### Phase 2: Execute
 
-6. **Run Ralph in background**
+4. **Run Ralph in background**
    ```bash
    .prp/scripts/ralph.sh $MAX_ITERATIONS $TRACKING_FILE
    ```
@@ -85,19 +70,26 @@ Before running Ralph, ensure:
    - Commit after each successful story
    - Stop when all complete or max iterations
 
-### Phase 4: Monitor
+### Phase 3: Monitor
 
-7. **Monitor progress with sleep/tail loop**
+5. **Monitor with SIMPLE, SEPARATE commands**
+
+   Run these as individual tool calls, NOT combined:
    ```bash
-   # Check every 60-90 seconds
-   sleep 60 && tail -40 ralph.log
+   sleep 60
+   ```
+   ```bash
+   tail -50 ralph.log
    ```
 
-   Keep running this pattern until Ralph completes. Also useful:
+   Repeat until Ralph completes or user interrupts.
+
+   **WRONG** (do not combine):
    ```bash
-   # Check story status
-   uv run python .prp/scripts/feature-status.py status $TRACKING_FILE
+   sleep 60 && tail -50 ralph.log  # NO!
    ```
+
+   **To check story status**: Use the Read tool on the tracking YAML file.
 
    User can also monitor in another terminal with `tail -f ralph.log`.
 
@@ -111,15 +103,10 @@ Ralph runs autonomously. When complete:
 
 Check results:
 ```bash
-# View commits made
 git log --oneline -10
-
-# Check final status
-uv run python .prp/scripts/feature-status.py status features/F####-name/F####-tracking.yaml
-
-# Run validation
-/validate
 ```
+
+Then use Read tool on tracking YAML to see final story statuses, and run `/validate`.
 
 ## Rollback
 
