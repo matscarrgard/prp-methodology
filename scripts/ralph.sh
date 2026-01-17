@@ -100,9 +100,36 @@ preflight_check() {
 
 ---
 
-## Iteration Log
+## Feature Execution History
+
+| Feature | Status | Stories | Iterations | Last Updated |
+|---------|--------|---------|------------|--------------|
+
+---
+
+## Current Feature
+
+*No active feature*
+EOF
+    fi
+
+    # Ensure iteration log exists for this feature
+    local feature_dir=$(dirname "$FEATURE_FILE")
+    local feature_id=$(basename "$feature_dir" | grep -oE "^F[0-9]{4}[a-z]?")
+    local iteration_log="$feature_dir/$feature_id-iterations.log"
+    local feature_name=$(basename "$feature_dir" | sed "s/^$feature_id-//" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
+
+    if [ ! -f "$iteration_log" ]; then
+        cat > "$iteration_log" << EOF
+# $feature_id $feature_name - Iteration Log
+
+Feature: $feature_id $feature_name
+Started: $(date '+%Y-%m-%d')
+
+---
 
 EOF
+        echo -e "${BLUE}Created iteration log: $iteration_log${NC}"
     fi
 
     echo -e "${BLUE}Feature file: $FEATURE_FILE${NC}"
@@ -146,6 +173,13 @@ get_story_testing() {
 get_feature_dir() {
     # Extract feature directory from feature file path
     dirname "$FEATURE_FILE"
+}
+
+get_iteration_log() {
+    # Get path to per-feature iteration log
+    local feature_dir=$(get_feature_dir)
+    local feature_id=$(basename "$feature_dir" | grep -oE "^F[0-9]{4}[a-z]?")
+    echo "$feature_dir/$feature_id-iterations.log"
 }
 
 # Post-story validation for UI stories
@@ -259,12 +293,13 @@ main() {
             echo -e "${GREEN}✓ All stories complete!${NC}"
             log "Feature completed successfully"
 
-            # Append completion marker to progress file
-            echo "" >> "$PROGRESS_FILE"
-            echo "---" >> "$PROGRESS_FILE"
-            echo "## FEATURE_COMPLETE" >> "$PROGRESS_FILE"
-            echo "Completed at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$PROGRESS_FILE"
-            echo "Iterations: $ITERATION" >> "$PROGRESS_FILE"
+            # Write to per-feature iteration log
+            ITERATION_LOG=$(get_iteration_log)
+            echo "" >> "$ITERATION_LOG"
+            echo "---" >> "$ITERATION_LOG"
+            echo "## FEATURE_COMPLETE" >> "$ITERATION_LOG"
+            echo "Completed at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$ITERATION_LOG"
+            echo "Total Iterations: $ITERATION" >> "$ITERATION_LOG"
 
             exit 0
         fi
@@ -275,12 +310,13 @@ main() {
             echo -e "${RED}✗ All remaining stories blocked${NC}"
             log "All stories blocked - human intervention needed"
 
-            # Append blocked marker to progress file
-            echo "" >> "$PROGRESS_FILE"
-            echo "---" >> "$PROGRESS_FILE"
-            echo "## ALL_BLOCKED" >> "$PROGRESS_FILE"
-            echo "Blocked at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$PROGRESS_FILE"
-            echo "Iterations: $ITERATION" >> "$PROGRESS_FILE"
+            # Write to per-feature iteration log
+            ITERATION_LOG=$(get_iteration_log)
+            echo "" >> "$ITERATION_LOG"
+            echo "---" >> "$ITERATION_LOG"
+            echo "## ALL_BLOCKED" >> "$ITERATION_LOG"
+            echo "Blocked at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$ITERATION_LOG"
+            echo "Total Iterations: $ITERATION" >> "$ITERATION_LOG"
 
             exit 1
         fi

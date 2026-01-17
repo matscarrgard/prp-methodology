@@ -8,16 +8,21 @@ Execute a SINGLE story from the current feature. One story per iteration, fresh 
    - These are learnings from previous iterations
    - Apply them to avoid repeating mistakes
 
-2. **Read the feature tracking YAML** - Find at `features/F####-*/F####-tracking.yaml`
+2. **Read the feature iteration log** - `features/F####-*/F####-iterations.log`
+   - Previous iterations for THIS feature
+   - Feature-specific context and learnings
+   - If file doesn't exist, you'll create it after first story
+
+3. **Read the feature tracking YAML** - Find at `features/F####-*/F####-tracking.yaml`
    - Find the first story with `status: pending`
    - Read its `criteria` for acceptance requirements
    - Check `notes` field for any context from previous attempts
 
-3. **Read the plan file** - Path is in the feature YAML's `plan` field
+4. **Read the plan file** - Path is in the feature YAML's `plan` field
    - Find the detailed task breakdown for the current story
    - Follow the implementation guidance
 
-4. **Read `CLAUDE.md`** - Project conventions and patterns
+5. **Read `CLAUDE.md`** - Project conventions and patterns
 
 ## Execution Process
 
@@ -79,11 +84,11 @@ Then:
 
 ## Memory Updates (REQUIRED)
 
-After EVERY story, append to `features/progress.txt`:
+After EVERY story, append to the **feature iteration log** (`features/F####-*/F####-iterations.log`):
 
 ```markdown
 ### Iteration N - YYYY-MM-DD HH:MM
-**Story**: F0001-03 - Story title
+**Story**: F####-## - Story title
 **Status**: complete | blocked
 **Learnings**:
 - [what was discovered that helps future iterations]
@@ -92,7 +97,8 @@ After EVERY story, append to `features/progress.txt`:
 **Commit**: [hash] (if complete)
 ```
 
-If you discover a REUSABLE pattern, add it to the "Codebase Patterns" section at the TOP of progress.txt.
+If you discover a REUSABLE pattern that benefits ALL features (not just this one),
+add it to the Codebase Patterns section in `features/progress.txt`.
 
 ## Feature YAML Updates
 

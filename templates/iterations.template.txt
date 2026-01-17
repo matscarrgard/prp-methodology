@@ -1,0 +1,19 @@
+# [FEATURE_ID] [FEATURE_NAME] - Iteration Log
+
+Feature: [FEATURE_ID] [FEATURE_NAME]
+Started: [YYYY-MM-DD]
+
+---
+
+<!--
+After each story, append:
+
+### Iteration N - YYYY-MM-DD HH:MM
+**Story**: F####-## - Story title
+**Status**: complete | blocked
+**Learnings**:
+- [what was discovered]
+**Files Changed**:
+- [list]
+**Commit**: [hash] (if complete)
+-->

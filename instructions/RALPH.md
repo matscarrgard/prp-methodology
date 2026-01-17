@@ -36,22 +36,24 @@ State persists through files, not context:
 | Tier | File | Scope | Contains |
 |------|------|-------|----------|
 | **1** | `CLAUDE.md` | Project-wide | Conventions, patterns, tech stack |
-| **2** | `features/progress.txt` | Feature-wide | Codebase patterns, iteration history |
-| **3** | `features/F####-name/F####-tracking.yaml` | Story-level | Status, criteria, per-story notes |
+| **2a** | `features/progress.txt` | Global | Codebase patterns (shared learnings), feature index |
+| **2b** | `features/F####-*/F####-iterations.log` | Feature | Iteration history for this feature |
+| **3** | `features/F####-*/F####-tracking.yaml` | Story-level | Status, criteria, per-story notes |
 
-Reading order matters: Tier 2 Codebase Patterns → Feature YAML → Plan file → CLAUDE.md
+Reading order: Tier 2a Codebase Patterns → Tier 2b Feature Iterations → Feature YAML → Plan → CLAUDE.md
 
 ## File Structure
 
 ```
 features/
 ├── BACKLOG.md                 # Feature status overview
-├── progress.txt               # Iteration memory (codebase patterns)
-├── F0001-epub-parsing/        # Per-feature folder
+├── progress.txt               # Codebase patterns + feature index (summary)
+├── F0001-epub-parsing/
 │   ├── F0001-spec.md          # Feature specification
 │   ├── F0001-plan.md          # Implementation plan
-│   └── F0001-tracking.yaml    # Story tracking (status, notes)
-└── archive/                   # Completed features (move folder here)
+│   ├── F0001-tracking.yaml    # Story tracking (status, notes)
+│   └── F0001-iterations.log   # Iteration history for this feature
+└── archive/                   # Completed features
 ```
 
 ## Feature YAML Format

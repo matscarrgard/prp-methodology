@@ -8,24 +8,16 @@ Add learnings that benefit ALL future iterations here.
 
 ---
 
-## Current Feature: [FEATURE_NAME]
-Folder: `features/F####-[feature-name]/`
-Branch: feature/[branch-name]
-Started: [YYYY-MM-DD]
+## Feature Execution History
+
+| Feature | Status | Stories | Iterations | Last Updated |
+|---------|--------|---------|------------|--------------|
 
 ---
 
-## Iteration Log
+## Current Feature
 
-<!--
-After each story, append:
-
-### Iteration N - [timestamp]
-**Story**: [ID] - [title]
-**Status**: complete|blocked
-**Learnings**:
-- [what was discovered]
-**Files Changed**:
-- [list]
-**Commit**: [hash] (if complete)
--->
+**[FEATURE_ID] - [FEATURE_NAME]**
+- Folder: `features/F####-[feature-name]/`
+- Log: `F####-iterations.log`
+- Started: [YYYY-MM-DD]
