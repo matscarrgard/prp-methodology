@@ -49,8 +49,12 @@ Execute a SINGLE story from the current feature. One story per iteration, fresh 
 
 ### 3. Verify
 - Run **story-specific tests first** (from criteria, e.g., `pytest tests/ -k "test_story_name"`)
-- Run validation commands from the feature YAML's `validation` section (lint, full test suite)
+- Run validation commands from the feature YAML's `validation` section:
+  - `lint`: Linting (always run)
+  - `test`: Quick validation (smoke tests preferred: `pytest -m smoke -x`)
+  - `full_test`: Full suite (only before commit if specified)
 - Fix any failures (up to 3 attempts)
+- **Prefer smoke tests** for iteration speed; full tests run at feature completion
 
 **Testing Rule**: Don't defer tests to a later story. Each story is verified independently.
 
