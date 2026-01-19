@@ -97,6 +97,7 @@ mkdir -p features/archive
 | Option | Repository | Description |
 |--------|------------|-------------|
 | **Python** | `matscarrgard/python-boilerplate` | FastAPI, FastHTML, SQLAlchemy patterns |
+| **Flutter** | `matscarrgard/boilerplate-flutter` | Riverpod, GoRouter, Dio, Hive patterns |
 | **None** | - | Start with minimal CLAUDE.md template |
 
 #### If Python selected (new project):
@@ -104,20 +105,20 @@ mkdir -p features/archive
 1. **Add boilerplate as subtree**
    ```bash
    git remote add py-boilerplate https://github.com/matscarrgard/python-boilerplate.git
-   git subtree add --prefix=.boilerplate py-boilerplate main --squash
+   git subtree add --prefix=.boilerplate-python py-boilerplate main --squash
    ```
 
 2. **Copy all boilerplate files to root**
    ```bash
-   cp .boilerplate/CLAUDE.md .
-   cp .boilerplate/pyproject.toml .
-   cp .boilerplate/.gitignore . 2>/dev/null || true
-   cp .boilerplate/.env.example . 2>/dev/null || true
-   cp -r .boilerplate/src .
-   cp -r .boilerplate/tests .
+   cp .boilerplate-python/CLAUDE.md .
+   cp \.boilerplate-python/pyproject.toml .
+   cp \.boilerplate-python/.gitignore . 2>/dev/null || true
+   cp \.boilerplate-python/.env.example . 2>/dev/null || true
+   cp -r \.boilerplate-python/src .
+   cp -r \.boilerplate-python/tests .
    mkdir -p docs/agents/guides
-   cp -r .boilerplate/docs/agents/guides/* docs/agents/guides/
-   cp .boilerplate/.claude/commands/scaffold.md .claude/commands/
+   cp -r \.boilerplate-python/docs/agents/guides/* docs/agents/guides/
+   cp \.boilerplate-python/.claude/commands/scaffold.md .claude/commands/
    ```
 
 3. **Install dependencies**
@@ -135,6 +136,66 @@ mkdir -p features/archive
    3. Run /prime to verify setup
    ```
 
+#### If Flutter selected (new project):
+
+1. **Add boilerplate as subtree**
+   ```bash
+   git remote add flutter-boilerplate https://github.com/matscarrgard/boilerplate-flutter.git
+   git subtree add --prefix=.boilerplate-flutter flutter-boilerplate main --squash
+   ```
+
+2. **Create Flutter project and copy boilerplate files**
+   ```bash
+   # Create Flutter project (use appropriate name)
+   flutter create --org com.example my_app
+   cd my_app
+
+   # Copy boilerplate files
+   cp ../.boilerplate-flutter/CLAUDE.md .
+   cp ../.boilerplate-flutter/templates/analysis_options.yaml .
+   cp ../.boilerplate-flutter/templates/pubspec.yaml.template pubspec.yaml
+
+   # Create directory structure
+   mkdir -p lib/config lib/services lib/providers lib/router lib/screens lib/widgets lib/models
+
+   # Copy templates
+   cp ../.boilerplate-flutter/templates/main.dart lib/
+   cp ../.boilerplate-flutter/templates/app.dart lib/
+   cp ../.boilerplate-flutter/templates/config/*.dart lib/config/
+   cp ../.boilerplate-flutter/templates/services/*.dart lib/services/
+   cp ../.boilerplate-flutter/templates/providers/*.dart lib/providers/
+   cp ../.boilerplate-flutter/templates/router/*.dart lib/router/
+   cp ../.boilerplate-flutter/templates/screens/*.dart lib/screens/
+
+   # Copy test templates
+   mkdir -p test/unit test/widget test/integration
+   cp ../.boilerplate-flutter/templates/tests/*.dart test/
+
+   # Copy guides
+   mkdir -p docs/guides
+   cp ../.boilerplate-flutter/docs/guides/*.md docs/guides/
+
+   # Copy scaffold command
+   mkdir -p .claude/commands
+   cp ../.boilerplate-flutter/.claude/commands/scaffold.md .claude/commands/
+   ```
+
+3. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+4. **Inform user**:
+   ```
+   Flutter boilerplate added!
+
+   Next steps:
+   1. Edit CLAUDE.md with your project name/description
+   2. Edit pubspec.yaml with your app name and dependencies
+   3. Run /scaffold to customize (app-only, app-api, app-offline, full)
+   4. Run flutter test to verify setup
+   ```
+
 #### If None selected (new project):
 
 1. **Create minimal CLAUDE.md from template**
@@ -150,19 +211,20 @@ mkdir -p features/archive
 
 **Ask the user using AskUserQuestion:**
 
-"Do you want to add the Python boilerplate as a reference for patterns and guides?"
+"Do you want to add a boilerplate as a reference for patterns and guides?"
 
-| Option | Description |
-|--------|-------------|
-| **Yes, add reference** | Add .boilerplate/ subtree, then choose what to adopt |
-| **No, skip** | Continue without boilerplate reference |
+| Option | Repository | Description |
+|--------|------------|-------------|
+| **Python** | `matscarrgard/python-boilerplate` | FastAPI, SQLAlchemy, testing patterns |
+| **Flutter** | `matscarrgard/boilerplate-flutter` | Riverpod, GoRouter, Dio, Hive patterns |
+| **No, skip** | - | Continue without boilerplate reference |
 
-#### If Yes selected (existing project):
+#### If Python selected (existing project):
 
 1. **Add boilerplate as subtree** (reference only)
    ```bash
    git remote add py-boilerplate https://github.com/matscarrgard/python-boilerplate.git
-   git subtree add --prefix=.boilerplate py-boilerplate main --squash
+   git subtree add --prefix=.boilerplate-python py-boilerplate main --squash
    ```
 
 2. **Show available assets using AskUserQuestion** (multiSelect: true):
@@ -175,7 +237,7 @@ mkdir -p features/archive
    | **Testing structure** | `tests/` | Unit/integration test layout with conftest.py |
    | **Scaffold command** | `.claude/commands/scaffold.md` | Project scaffolding for adding new features |
    | **Example configs** | `.env.example`, `.gitignore` | Environment and git configuration |
-   | **None** | - | Just keep .boilerplate/ as reference |
+   | **None** | - | Just keep \.boilerplate-python/ as reference |
 
 3. **Copy selected assets** (merge, don't overwrite):
 
@@ -183,7 +245,7 @@ mkdir -p features/archive
    ```bash
    mkdir -p docs/agents/guides
    # Copy guides that don't exist locally
-   for guide in .boilerplate/docs/agents/guides/*.md; do
+   for guide in \.boilerplate-python/docs/agents/guides/*.md; do
      name=$(basename "$guide")
      [ -f "docs/agents/guides/$name" ] || cp "$guide" "docs/agents/guides/"
    done
@@ -193,39 +255,98 @@ mkdir -p features/archive
    **Testing structure** (if selected):
    ```bash
    mkdir -p tests/unit tests/integration
-   [ -f tests/conftest.py ] || cp .boilerplate/tests/conftest.py tests/
-   [ -f tests/__init__.py ] || cp .boilerplate/tests/__init__.py tests/
+   [ -f tests/conftest.py ] || cp \.boilerplate-python/tests/conftest.py tests/
+   [ -f tests/__init__.py ] || cp \.boilerplate-python/tests/__init__.py tests/
    echo "Created test structure. Existing tests preserved."
    ```
 
    **Scaffold command** (if selected):
    ```bash
-   cp .boilerplate/.claude/commands/scaffold.md .claude/commands/
+   cp \.boilerplate-python/.claude/commands/scaffold.md .claude/commands/
    echo "Added /scaffold command. Run it to add new components."
    ```
 
    **Example configs** (if selected):
    ```bash
-   [ -f .env.example ] || cp .boilerplate/.env.example .
+   [ -f .env.example ] || cp \.boilerplate-python/.env.example .
    # For .gitignore, append rather than overwrite
    if [ -f .gitignore ]; then
-     echo "# Check .boilerplate/.gitignore for additional patterns" >> .gitignore
+     echo "# Check \.boilerplate-python/.gitignore for additional patterns" >> .gitignore
    else
-     cp .boilerplate/.gitignore .
+     cp \.boilerplate-python/.gitignore .
    fi
    ```
 
 4. **Inform user**:
    ```
-   Boilerplate reference added at .boilerplate/
+   Boilerplate reference added at \.boilerplate-python/
 
    Selected assets copied to your project.
-   The .boilerplate/ directory is kept as a reference - browse it for:
+   The \.boilerplate-python/ directory is kept as a reference - browse it for:
    - Additional patterns and examples
    - Template code to adapt
 
    To update boilerplate later:
-   - Pull: git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+   - Pull: git subtree pull --prefix=.boilerplate-python py-boilerplate main --squash
+
+   Next: Run /prd to create a PRD for your existing project.
+   ```
+
+#### If Flutter selected (existing project):
+
+1. **Add boilerplate as subtree** (reference only)
+   ```bash
+   git remote add flutter-boilerplate https://github.com/matscarrgard/boilerplate-flutter.git
+   git subtree add --prefix=.boilerplate-flutter flutter-boilerplate main --squash
+   ```
+
+2. **Show available assets using AskUserQuestion** (multiSelect: true):
+
+   "What would you like to adopt from the Flutter boilerplate?"
+
+   | Option | Path | Description |
+   |--------|------|-------------|
+   | **Pattern guides** | `docs/guides/` | Flutter, Riverpod, testing patterns |
+   | **Scaffold command** | `.claude/commands/scaffold.md` | Project scaffolding (app-only, app-api, etc.) |
+   | **Analysis options** | `templates/analysis_options.yaml` | Strict Dart linting rules |
+   | **None** | - | Just keep .boilerplate-flutter/ as reference |
+
+3. **Copy selected assets** (merge, don't overwrite):
+
+   **Pattern guides** (if selected):
+   ```bash
+   mkdir -p docs/guides
+   for guide in .boilerplate-flutter/docs/guides/*.md; do
+     name=$(basename "$guide")
+     [ -f "docs/guides/$name" ] || cp "$guide" "docs/guides/"
+   done
+   echo "Copied guides. Review and customize for your project."
+   ```
+
+   **Scaffold command** (if selected):
+   ```bash
+   mkdir -p .claude/commands
+   cp .boilerplate-flutter/.claude/commands/scaffold.md .claude/commands/
+   echo "Added /scaffold command. Run it to add new components."
+   ```
+
+   **Analysis options** (if selected):
+   ```bash
+   [ -f analysis_options.yaml ] || cp .boilerplate-flutter/templates/analysis_options.yaml .
+   echo "Copied analysis_options.yaml. Existing file preserved if present."
+   ```
+
+4. **Inform user**:
+   ```
+   Flutter boilerplate reference added at .boilerplate-flutter/
+
+   Selected assets copied to your project.
+   The .boilerplate-flutter/ directory is kept as a reference - browse it for:
+   - Template code (services, providers, screens)
+   - Flutter version gotchas (flutter-learnings.md)
+
+   To update boilerplate later:
+   - Pull: git subtree pull --prefix=.boilerplate-flutter flutter-boilerplate main --squash
 
    Next: Run /prd to create a PRD for your existing project.
    ```
@@ -248,7 +369,8 @@ echo "=== Verifying setup ==="
 ls -la .claude/commands/ | head -5
 ls -la .claude/skills/
 ls features/
-[ -d .boilerplate ] && echo ".boilerplate/ present (reference)"
+[ -d .boilerplate-python ] && echo ".boilerplate-python/ present (Python reference)"
+[ -d .boilerplate-flutter ] && echo ".boilerplate-flutter/ present (Flutter reference)"
 head -5 CLAUDE.md 2>/dev/null || echo "CLAUDE.md: update needed"
 ```
 
@@ -260,7 +382,7 @@ head -5 CLAUDE.md 2>/dev/null || echo "CLAUDE.md: update needed"
 
 - [x] .claude/ configured with methodology commands
 - [x] features/progress.txt created
-- [x] Boilerplate: {Python | None}
+- [x] Boilerplate: {Python | Flutter | None}
 
 Next steps:
 1. Edit CLAUDE.md with your project details
@@ -290,6 +412,7 @@ Next steps:
 | Language | Repository | Status |
 |----------|------------|--------|
 | Python | `matscarrgard/python-boilerplate` | Available |
+| Flutter | `matscarrgard/boilerplate-flutter` | Available |
 | React | `matscarrgard/react-boilerplate` | Coming soon |
 | Go | `matscarrgard/go-boilerplate` | Coming soon |
 
@@ -302,16 +425,22 @@ Running `/init-project` again will:
 
 ## Updating Templates
 
-Both `.prp/` and `.boilerplate/` are git subtrees.
+`.prp/` and boilerplate directories are git subtrees.
 
 ```bash
-# Pull latest
+# Pull latest methodology
 git subtree pull --prefix=.prp prp-method main --squash
-git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+
+# Pull latest Python boilerplate (if present)
+git subtree pull --prefix=.boilerplate-python py-boilerplate main --squash
+
+# Pull latest Flutter boilerplate (if present)
+git subtree pull --prefix=.boilerplate-flutter flutter-boilerplate main --squash
 
 # Push improvements
 git subtree push --prefix=.prp prp-method main
-git subtree push --prefix=.boilerplate py-boilerplate main
+git subtree push --prefix=.boilerplate-python py-boilerplate main
+git subtree push --prefix=.boilerplate-flutter flutter-boilerplate main
 ```
 
 **Always pull before making changes** to avoid conflicts.

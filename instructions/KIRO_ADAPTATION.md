@@ -249,9 +249,9 @@ Update the tracking file status as you complete each story.
 
 Copy or symlink to project root:
 ```bash
-cp .boilerplate/AGENTS.md ./AGENTS.md
+cp .boilerplate-python/AGENTS.md ./AGENTS.md
 # or
-ln -s .boilerplate/AGENTS.md ./AGENTS.md
+ln -s .boilerplate-python/AGENTS.md ./AGENTS.md
 ```
 
 Kiro will read this automatically.

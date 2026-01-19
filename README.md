@@ -111,22 +111,26 @@ Then in Claude:
 | Language | Repository | Status |
 |----------|------------|--------|
 | Python | `matscarrgard/python-boilerplate` | Available |
+| Flutter | `matscarrgard/boilerplate-flutter` | Available |
 | React | - | Coming soon |
 | Go | - | Coming soon |
 
-Boilerplates are added as subtrees at `.boilerplate/` and files are copied to root.
+Boilerplates are added as subtrees (`.boilerplate-python/`, `.boilerplate-flutter/`) and files are copied to root.
 This keeps your project decoupled while allowing template updates.
 
 ## Updating Templates
 
-Both methodology (`.prp/`) and boilerplate (`.boilerplate/`) are git subtrees.
+Methodology (`.prp/`) and boilerplates are git subtrees.
 
 ```bash
 # Pull latest methodology
 git subtree pull --prefix=.prp prp-method main --squash
 
-# Pull latest boilerplate (if using Python)
-git subtree pull --prefix=.boilerplate py-boilerplate main --squash
+# Pull latest Python boilerplate (if present)
+git subtree pull --prefix=.boilerplate-python py-boilerplate main --squash
+
+# Pull latest Flutter boilerplate (if present)
+git subtree pull --prefix=.boilerplate-flutter flutter-boilerplate main --squash
 ```
 
 To push improvements back:
@@ -135,8 +139,11 @@ To push improvements back:
 # Push methodology improvements
 git subtree push --prefix=.prp prp-method main
 
-# Push boilerplate improvements
-git subtree push --prefix=.boilerplate py-boilerplate main
+# Push Python boilerplate improvements
+git subtree push --prefix=.boilerplate-python py-boilerplate main
+
+# Push Flutter boilerplate improvements
+git subtree push --prefix=.boilerplate-flutter flutter-boilerplate main
 ```
 
 **Note**: Always pull before making changes to avoid conflicts.
