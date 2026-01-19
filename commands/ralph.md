@@ -57,8 +57,11 @@ Feature must have been planned with `/plan-feature` which creates:
 ### Phase 2: Execute
 
 4. **Run Ralph in background**
+
+   **IMPORTANT**: Ralph must run from the git repository root (not a subdirectory like `backend/`).
+
    ```bash
-   .prp/scripts/ralph.sh $MAX_ITERATIONS $TRACKING_FILE
+   cd "$(git rev-parse --show-toplevel)" && .prp/scripts/ralph.sh $MAX_ITERATIONS $TRACKING_FILE
    ```
 
    Run this command with `run_in_background: true` so you can monitor progress.
@@ -74,12 +77,17 @@ Feature must have been planned with `/plan-feature` which creates:
 
 5. **Monitor with SIMPLE, SEPARATE commands**
 
+   Define the git root for monitoring (ralph.log is at the repo root):
+   ```bash
+   GIT_ROOT="$(git rev-parse --show-toplevel)"
+   ```
+
    Run these as individual tool calls, NOT combined:
    ```bash
    sleep 60
    ```
    ```bash
-   tail -50 ralph.log
+   tail -50 "$GIT_ROOT/ralph.log"
    ```
 
    Repeat until Ralph completes or user interrupts.
@@ -91,7 +99,7 @@ Feature must have been planned with `/plan-feature` which creates:
 
    **To check story status**: Use the Read tool on the tracking YAML file.
 
-   User can also monitor in another terminal with `tail -f ralph.log`.
+   User can also monitor in another terminal with `tail -f ralph.log` (from repo root).
 
 ## Output
 
@@ -137,8 +145,8 @@ git stash pop stash@{N}
 # 2. Run Ralph
 /ralph F0004c
 
-# 3. Monitor in another terminal
-tail -f ralph.log
+# 3. Monitor in another terminal (from repo root)
+cd "$(git rev-parse --show-toplevel)" && tail -f ralph.log
 
 # 4. When done, validate
 /validate
