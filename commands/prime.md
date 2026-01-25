@@ -2,6 +2,10 @@
 
 Load project context and prepare for a new task.
 
+## Important
+
+When running shell commands (like `git status`), run them **without** the `-C` flag. Claude Code already runs from the project's working directory, so `-C` is unnecessary.
+
 ## Process
 
 1. **Read core documentation**
@@ -14,7 +18,7 @@ Load project context and prepare for a new task.
    - List docs directory to know available reference docs
 
 3. **Check project state**
-   - Run `git status` to see uncommitted changes
+   - Run `git status` to see uncommitted changes (no `-C` flag needed)
    - Run validation command if configured
 
 4. **Load session state**
