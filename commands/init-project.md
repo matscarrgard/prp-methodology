@@ -65,6 +65,7 @@ Then run /init-project again.
    ```bash
    ln -sf ../../.prp/skills/prp-methodology .claude/skills/prp-methodology
    ln -sf ../../.prp/skills/error-handling .claude/skills/error-handling
+   ln -sf ../../.prp/skills/brainstorm .claude/skills/brainstorm
    ```
 
 5. **Configure hooks** in `.claude/settings.json`
