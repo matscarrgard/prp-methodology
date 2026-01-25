@@ -98,6 +98,7 @@ mkdir -p features/archive
 |--------|------------|-------------|
 | **Python** | `matscarrgard/python-boilerplate` | FastAPI, FastHTML, SQLAlchemy patterns |
 | **Flutter** | `matscarrgard/boilerplate-flutter` | Riverpod, GoRouter, Dio, Hive patterns |
+| **Next.js/Sanity** | `matscarrgard/boilerplate-nextjs-sanity` | Next.js 16, Sanity CMS, Tailwind v4 |
 | **None** | - | Start with minimal CLAUDE.md template |
 
 #### If Python selected (new project):
@@ -196,6 +197,47 @@ mkdir -p features/archive
    4. Run flutter test to verify setup
    ```
 
+#### If Next.js/Sanity selected (new project):
+
+1. **Add boilerplate as subtree**
+   ```bash
+   git remote add nextjs-boilerplate https://github.com/matscarrgard/boilerplate-nextjs-sanity.git
+   git subtree add --prefix=.boilerplate-nextjs-sanity nextjs-boilerplate main --squash
+   ```
+
+2. **Copy boilerplate files to root**
+   ```bash
+   cp .boilerplate-nextjs-sanity/CLAUDE.md .
+   cp .boilerplate-nextjs-sanity/package.json .
+   cp .boilerplate-nextjs-sanity/next.config.ts .
+   cp .boilerplate-nextjs-sanity/tsconfig.json .
+   cp .boilerplate-nextjs-sanity/sanity.config.ts .
+   cp .boilerplate-nextjs-sanity/postcss.config.mjs .
+   cp .boilerplate-nextjs-sanity/.gitignore . 2>/dev/null || true
+   cp .boilerplate-nextjs-sanity/.env.example . 2>/dev/null || true
+   cp -r .boilerplate-nextjs-sanity/src .
+   mkdir -p docs/agents/guides
+   cp -r .boilerplate-nextjs-sanity/docs/agents/guides/* docs/agents/guides/
+   cp .boilerplate-nextjs-sanity/.claude/commands/scaffold.md .claude/commands/
+   ```
+
+3. **Install dependencies**
+   ```bash
+   bun install
+   ```
+
+4. **Inform user**:
+   ```
+   Next.js/Sanity boilerplate added!
+
+   Next steps:
+   1. Edit CLAUDE.md with your project name/description
+   2. Create Sanity project at sanity.io/manage
+   3. Copy Project ID to .env.local
+   4. Run `bun dev` and open /studio
+   5. Run /scaffold to add features (blog, authors, etc.)
+   ```
+
 #### If None selected (new project):
 
 1. **Create minimal CLAUDE.md from template**
@@ -217,6 +259,7 @@ mkdir -p features/archive
 |--------|------------|-------------|
 | **Python** | `matscarrgard/python-boilerplate` | FastAPI, SQLAlchemy, testing patterns |
 | **Flutter** | `matscarrgard/boilerplate-flutter` | Riverpod, GoRouter, Dio, Hive patterns |
+| **Next.js/Sanity** | `matscarrgard/boilerplate-nextjs-sanity` | Next.js 16, Sanity CMS, Tailwind v4 patterns |
 | **No, skip** | - | Continue without boilerplate reference |
 
 #### If Python selected (existing project):
@@ -351,6 +394,65 @@ mkdir -p features/archive
    Next: Run /prd to create a PRD for your existing project.
    ```
 
+#### If Next.js/Sanity selected (existing project):
+
+1. **Add boilerplate as subtree** (reference only)
+   ```bash
+   git remote add nextjs-boilerplate https://github.com/matscarrgard/boilerplate-nextjs-sanity.git
+   git subtree add --prefix=.boilerplate-nextjs-sanity nextjs-boilerplate main --squash
+   ```
+
+2. **Show available assets using AskUserQuestion** (multiSelect: true):
+
+   "What would you like to adopt from the Next.js/Sanity boilerplate?"
+
+   | Option | Path | Description |
+   |--------|------|-------------|
+   | **Pattern guides** | `docs/agents/guides/` | Next.js, Sanity, Tailwind patterns |
+   | **Scaffold command** | `.claude/commands/scaffold.md` | Add blog, authors, etc. |
+   | **Example configs** | `.env.example`, `.gitignore` | Environment and git configuration |
+   | **None** | - | Just keep .boilerplate-nextjs-sanity/ as reference |
+
+3. **Copy selected assets** (merge, don't overwrite):
+
+   **Pattern guides** (if selected):
+   ```bash
+   mkdir -p docs/agents/guides
+   for guide in .boilerplate-nextjs-sanity/docs/agents/guides/*.md; do
+     name=$(basename "$guide")
+     [ -f "docs/agents/guides/$name" ] || cp "$guide" "docs/agents/guides/"
+   done
+   echo "Copied guides. Review and customize for your project."
+   ```
+
+   **Scaffold command** (if selected):
+   ```bash
+   mkdir -p .claude/commands
+   cp .boilerplate-nextjs-sanity/.claude/commands/scaffold.md .claude/commands/
+   echo "Added /scaffold command. Run it to add blog, authors, etc."
+   ```
+
+   **Example configs** (if selected):
+   ```bash
+   [ -f .env.example ] || cp .boilerplate-nextjs-sanity/.env.example .
+   ```
+
+4. **Inform user**:
+   ```
+   Next.js/Sanity boilerplate reference added at .boilerplate-nextjs-sanity/
+
+   Selected assets copied to your project.
+   The .boilerplate-nextjs-sanity/ directory is kept as a reference - browse it for:
+   - Component patterns (Hero, Container, Layout)
+   - Sanity schema examples
+   - Design system tokens
+
+   To update boilerplate later:
+   - Pull: git subtree pull --prefix=.boilerplate-nextjs-sanity nextjs-boilerplate main --squash
+
+   Next: Run /prd to create a PRD for your existing project.
+   ```
+
 #### If No selected (existing project):
 
 ```
@@ -371,6 +473,7 @@ ls -la .claude/skills/
 ls features/
 [ -d .boilerplate-python ] && echo ".boilerplate-python/ present (Python reference)"
 [ -d .boilerplate-flutter ] && echo ".boilerplate-flutter/ present (Flutter reference)"
+[ -d .boilerplate-nextjs-sanity ] && echo ".boilerplate-nextjs-sanity/ present (Next.js reference)"
 head -5 CLAUDE.md 2>/dev/null || echo "CLAUDE.md: update needed"
 ```
 
@@ -413,6 +516,7 @@ Next steps:
 |----------|------------|--------|
 | Python | `matscarrgard/python-boilerplate` | Available |
 | Flutter | `matscarrgard/boilerplate-flutter` | Available |
+| Next.js/Sanity | `matscarrgard/boilerplate-nextjs-sanity` | Available |
 | React | `matscarrgard/react-boilerplate` | Coming soon |
 | Go | `matscarrgard/go-boilerplate` | Coming soon |
 
@@ -437,10 +541,14 @@ git subtree pull --prefix=.boilerplate-python py-boilerplate main --squash
 # Pull latest Flutter boilerplate (if present)
 git subtree pull --prefix=.boilerplate-flutter flutter-boilerplate main --squash
 
+# Pull latest Next.js/Sanity boilerplate (if present)
+git subtree pull --prefix=.boilerplate-nextjs-sanity nextjs-boilerplate main --squash
+
 # Push improvements
 git subtree push --prefix=.prp prp-method main
 git subtree push --prefix=.boilerplate-python py-boilerplate main
 git subtree push --prefix=.boilerplate-flutter flutter-boilerplate main
+git subtree push --prefix=.boilerplate-nextjs-sanity nextjs-boilerplate main
 ```
 
 **Always pull before making changes** to avoid conflicts.
